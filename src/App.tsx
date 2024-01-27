@@ -1,22 +1,20 @@
-// import { signInWithEmailAndPassword, User, UserCredential } from "firebase/auth"
-// import { auth } from "./firebase"
-/** @jsxImportSource @emotion/react */
-import { css } from "@emotion/react"
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import Home from './components/pages/Home'
+import About from './components/pages/About'
+import Products from './components/pages/Products'
 
-const title = css`
-  color: red;
-`
-
-const App = () => {
-  // signInWithEmailAndPassword(auth, "example@gmail.com", "exampleuser").then(
-  //   (credential: UserCredential) => {
-  //     const user: User = credential.user
-  //     if (user) {
-  //       console.log("Login: Success!!")
-  //     }
-  //   }
-  // )
-  return <div css={title}>App</div>
+function App () {
+  return (
+    <>
+      <Router>
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/products' element={<Products />} />
+        </Routes>
+      </Router>
+    </>
+  )
 }
 
 export default App
