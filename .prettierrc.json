@@ -1,5 +1,0 @@
-{
-  "singleQuote": true,
-  "editor.defaultFormatter": "sbenp.prettier-vscode",
-  "editor.formatOnSave": true
-}
