@@ -1,6 +1,7 @@
-import { FirebaseApp, initializeApp } from "firebase/app";
-import { Auth, getAuth } from "firebase/auth";
-import { Firestore, getFirestore } from "firebase/firestore";
+import { FirebaseApp, initializeApp } from 'firebase/app'
+import { Auth, getAuth } from 'firebase/auth'
+import { Firestore, getFirestore } from 'firebase/firestore'
+import { Functions, getFunctions } from 'firebase/functions'
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_APIKEY,
@@ -11,6 +12,7 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_APP_ID
 }
 
-const app: FirebaseApp = initializeApp(firebaseConfig);
-export const auth: Auth = getAuth();
-export const db: Firestore = getFirestore(app);
+const app: FirebaseApp = initializeApp(firebaseConfig)
+export const auth: Auth = getAuth()
+export const db: Firestore = getFirestore(app)
+export const functions: Functions = getFunctions(app, 'asia-northeast1')
