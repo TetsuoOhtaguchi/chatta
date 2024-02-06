@@ -7,8 +7,31 @@ import Input from '../ui/input/Input'
 import { functions } from '../../firebase'
 import { httpsCallable } from 'firebase/functions'
 
+const signupSection = css`
+  display: grid;
+  place-items: center;
+  height: 100vh;
+`
+
+const flexBox = css`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+`
+
 const title = css`
-  color: green;
+  font-size: 36px;
+  font-weight: 600;
+`
+
+const loginLink = css`
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  text-align: center;
 `
 
 const SignupPage: React.FC = () => {
@@ -36,7 +59,7 @@ const SignupPage: React.FC = () => {
 
       if (data.success) {
         // 新規登録が成功した場合、ログインページにリダイレクト
-        navigate('/login')
+        navigate('/')
         setEmail('')
         setPassword('')
       }
@@ -48,21 +71,25 @@ const SignupPage: React.FC = () => {
   }
 
   return (
-    <>
-      <h1 css={title}>Signup</h1>
-      <Input
-        modelValue={email}
-        label='email'
-        onUpdateModelValue={emailUpdate}
-      />
-      <Input
-        modelValue={password}
-        label='password'
-        onUpdateModelValue={passwordUpdate}
-      />
-      <Button onClick={signupHandler} child='Signup' />
-      <Link to={'/login'}>Login</Link>
-    </>
+    <section css={signupSection}>
+      <div css={flexBox}>
+        <div css={title}>Signup</div>
+        <Input
+          modelValue={email}
+          label='Email'
+          onUpdateModelValue={emailUpdate}
+        />
+        <Input
+          modelValue={password}
+          label='Password'
+          onUpdateModelValue={passwordUpdate}
+        />
+        <Button onClick={signupHandler} child='Signup' />
+        <Link css={loginLink} to={'/'}>
+          Login
+        </Link>
+      </div>
+    </section>
   )
 }
 
