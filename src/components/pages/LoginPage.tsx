@@ -7,8 +7,31 @@ import Input from '../ui/input/Input'
 import { signInWithEmailAndPassword, UserCredential } from 'firebase/auth'
 import { auth } from '../../firebase'
 
+const loginSection = css`
+  display: grid;
+  place-items: center;
+  height: 100vh;
+`
+
+const flexBox = css`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+`
+
 const title = css`
-  color: skyblue;
+  font-size: 36px;
+  font-weight: 600;
+`
+
+const signupLink = css`
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  cursor: pointer;
+  text-align: center;
 `
 
 const LoginPage: React.FC = () => {
@@ -45,21 +68,25 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <>
-      <h1 css={title}>Login</h1>
-      <Input
-        modelValue={email}
-        label='email'
-        onUpdateModelValue={emailUpdate}
-      />
-      <Input
-        modelValue={password}
-        label='password'
-        onUpdateModelValue={passwordUpdate}
-      />
-      <Button onClick={loginHandler} child='Login' />
-      <Link to={'/signup'}>Signup</Link>
-    </>
+    <section css={loginSection}>
+      <div css={flexBox}>
+        <div css={title}>Login</div>
+        <Input
+          modelValue={email}
+          label='Email'
+          onUpdateModelValue={emailUpdate}
+        />
+        <Input
+          modelValue={password}
+          label='Password'
+          onUpdateModelValue={passwordUpdate}
+        />
+        <Button onClick={loginHandler} child='Login' />
+        <Link css={signupLink} to={'/signup'}>
+          Signup
+        </Link>
+      </div>
+    </section>
   )
 }
 
