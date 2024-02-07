@@ -76,11 +76,13 @@ const SignupPage: React.FC = () => {
         <div css={title}>Signup</div>
         <Input
           modelValue={email}
+          type='text'
           label='Email'
           onUpdateModelValue={emailUpdate}
         />
         <Input
           modelValue={password}
+          type='password'
           label='Password'
           onUpdateModelValue={passwordUpdate}
         />

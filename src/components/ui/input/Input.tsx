@@ -4,6 +4,22 @@ import { css } from '@emotion/react'
 
 interface InputProps {
   modelValue: string | number
+  type:
+    | 'text'
+    | 'password'
+    | 'checkbox'
+    | 'radio'
+    | 'submit'
+    | 'reset'
+    | 'button'
+    | 'file'
+    | 'hidden'
+    | 'date'
+    | 'email'
+    | 'number'
+    | 'tel'
+    | 'url'
+    | 'search'
   label: string
   onUpdateModelValue: (event: ChangeEvent<HTMLInputElement>) => void
 }
@@ -34,6 +50,7 @@ const input = css`
 
 const Input: React.FC<InputProps> = ({
   modelValue,
+  type,
   label,
   onUpdateModelValue
 }) => {
@@ -44,6 +61,7 @@ const Input: React.FC<InputProps> = ({
       </label>
       <input
         css={input}
+        type={type}
         id={label}
         value={modelValue}
         onChange={onUpdateModelValue}
