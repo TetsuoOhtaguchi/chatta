@@ -73,11 +73,13 @@ const LoginPage: React.FC = () => {
         <div css={title}>Login</div>
         <Input
           modelValue={email}
+          type='text'
           label='Email'
           onUpdateModelValue={emailUpdate}
         />
         <Input
           modelValue={password}
+          type='password'
           label='Password'
           onUpdateModelValue={passwordUpdate}
         />
