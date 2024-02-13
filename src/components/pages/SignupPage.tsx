@@ -71,27 +71,29 @@ const SignupPage: React.FC = () => {
   }
 
   return (
-    <section css={signupSection}>
-      <div css={flexBox}>
-        <div css={title}>Signup</div>
-        <Input
-          modelValue={email}
-          type='text'
-          label='Email'
-          onUpdateModelValue={emailUpdate}
-        />
-        <Input
-          modelValue={password}
-          type='password'
-          label='Password'
-          onUpdateModelValue={passwordUpdate}
-        />
-        <Button onClick={signupHandler} child='Signup' />
-        <Link css={loginLink} to={'/'}>
-          Login
-        </Link>
-      </div>
-    </section>
+    <>
+      <form css={signupSection}>
+        <div css={flexBox}>
+          <h2 css={title}>Signup</h2>
+          <Input
+            modelValue={email}
+            type='text'
+            label='Email'
+            onUpdateModelValue={emailUpdate}
+          />
+          <Input
+            modelValue={password}
+            type='password'
+            label='Password'
+            onUpdateModelValue={passwordUpdate}
+          />
+          <Button onClick={signupHandler} child='Signup' />
+          <Link css={loginLink} to={'/'}>
+            Login
+          </Link>
+        </div>
+      </form>
+    </>
   )
 }
 
