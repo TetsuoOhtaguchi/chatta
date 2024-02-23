@@ -1,8 +1,16 @@
+/** @jsxImportSource @emotion/react */
+import { css } from '@emotion/react'
+
+const title = css`
+  font-size: 36px;
+  font-weight: 600;
+`
+
 const FriendsPage: React.FC = () => {
   return (
-    <section>
-      <div>FriendsPage</div>
-    </section>
+    <>
+      <h2 css={title}>Friends</h2>
+    </>
   )
 }
 
