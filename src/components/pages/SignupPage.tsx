@@ -2,6 +2,8 @@
 import React, { ChangeEvent, MouseEventHandler, useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { css } from '@emotion/react'
+import '../../assets/css/variable.css'
+import { validationCheck } from '../../utils/helpers/validation'
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
 import { functions } from '../../firebase'
@@ -25,13 +27,17 @@ const flexBox = css`
 const profileImageStyle = css`
   width: 100px;
   height: 100px;
-  background-color: #dcdcdc;
+  background-color: var(--bg-grey);
   padding: 1px;
   border-radius: 50%;
   cursor: pointer;
   object-fit: cover;
   vertical-align: top;
   margin: 0 auto;
+`
+
+const profileImageErrorStyle = css`
+  background-color: var(--bg-error);
 `
 
 const loginLink = css`
@@ -51,6 +57,11 @@ const SignupPage: React.FC = () => {
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
+
+  const [fileError, setFileError] = useState<boolean>(false)
+  const [nameError, setNameError] = useState<boolean>(false)
+  const [emailError, setEmailError] = useState<boolean>(false)
+  const [passwordError, setPasswordError] = useState<boolean>(false)
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -81,6 +92,24 @@ const SignupPage: React.FC = () => {
   // 新規登録処理を実行する
   const signupHandler: MouseEventHandler<HTMLButtonElement> = async event => {
     event.preventDefault()
+
+    setFileError(validationCheck('', fileObject, 'file'))
+    setNameError(validationCheck(name, null, 'name'))
+    setEmailError(validationCheck(email, null, 'email'))
+    setPasswordError(validationCheck(password, null, 'password'))
+    const fileErrorCheck = validationCheck('', fileObject, 'file')
+    const nameErrorCheck = validationCheck(name, null, 'name')
+    const emailErrorCheck = validationCheck(email, null, 'email')
+    const passwordErrorCheck = validationCheck(password, null, 'password')
+
+    if (
+      fileErrorCheck ||
+      nameErrorCheck ||
+      emailErrorCheck ||
+      passwordErrorCheck
+    )
+      return
+
     try {
       // Firebase Cloud Functionsを呼び出す
       // Authにユーザー情報を登録し、Firestoreにユーザー情報を保存する
@@ -126,7 +155,7 @@ const SignupPage: React.FC = () => {
           <img
             src={src}
             alt='profile image'
-            css={profileImageStyle}
+            css={[profileImageStyle, fileError && profileImageErrorStyle]}
             onClick={onImageClick}
           />
           <input
@@ -140,18 +169,21 @@ const SignupPage: React.FC = () => {
             modelValue={name}
             type='text'
             label='Name'
+            error={nameError}
             onUpdateModelValue={nameUpdate}
           />
           <Input
             modelValue={email}
             type='text'
             label='Email'
+            error={emailError}
             onUpdateModelValue={emailUpdate}
           />
           <Input
             modelValue={password}
             type='password'
             label='Password'
+            error={passwordError}
             onUpdateModelValue={passwordUpdate}
           />
           <Button onClick={signupHandler} child='Signup' />

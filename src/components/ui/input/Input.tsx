@@ -21,6 +21,7 @@ interface InputProps {
     | 'url'
     | 'search'
   label: string
+  error: boolean
   onUpdateModelValue: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
@@ -48,10 +49,15 @@ const input = css`
   height: 36px;
 `
 
+const errorInput = css`
+  background-color: var(--bg-error);
+`
+
 const Input: React.FC<InputProps> = ({
   modelValue,
   type,
   label,
+  error,
   onUpdateModelValue
 }) => {
   return (
@@ -60,7 +66,7 @@ const Input: React.FC<InputProps> = ({
         {label}
       </label>
       <input
-        css={input}
+        css={[input, error && errorInput]}
         type={type}
         id={label}
         value={modelValue}

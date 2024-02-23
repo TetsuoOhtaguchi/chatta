@@ -2,6 +2,7 @@
 import React, { ChangeEvent, MouseEventHandler, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { css } from '@emotion/react'
+import { validationCheck } from '../../utils/helpers/validation'
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
 import { signInWithEmailAndPassword, UserCredential } from 'firebase/auth'
@@ -35,6 +36,9 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
+  const [emailError, setEmailError] = useState<boolean>(false)
+  const [passwordError, setPasswordError] = useState<boolean>(false)
+
   const emailUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value)
   }
@@ -45,6 +49,14 @@ const LoginPage: React.FC = () => {
 
   const loginHandler: MouseEventHandler<HTMLButtonElement> = async event => {
     event.preventDefault()
+
+    setEmailError(validationCheck(email, null, 'email'))
+    setPasswordError(validationCheck(password, null, 'password'))
+    const emailErrorCheck = validationCheck(email, null, 'email')
+    const passwordErrorCheck = validationCheck(password, null, 'password')
+
+    if (emailErrorCheck || passwordErrorCheck) return
+
     try {
       const credential: UserCredential = await signInWithEmailAndPassword(
         auth,
@@ -84,12 +96,14 @@ const LoginPage: React.FC = () => {
             modelValue={email}
             type='text'
             label='Email'
+            error={emailError}
             onUpdateModelValue={emailUpdate}
           />
           <Input
             modelValue={password}
             type='password'
             label='Password'
+            error={passwordError}
             onUpdateModelValue={passwordUpdate}
           />
           <Button onClick={loginHandler} child='Login' />
