@@ -1,11 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import React, { ChangeEvent, MouseEventHandler, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { css } from '@emotion/react'
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
 import { signInWithEmailAndPassword, UserCredential } from 'firebase/auth'
-import { auth } from '../../firebase'
+import { auth, db } from '../../firebase'
+import { getDoc, doc } from 'firebase/firestore'
 
 const loginSection = css`
   display: grid;
@@ -20,11 +21,6 @@ const flexBox = css`
   gap: 40px;
 `
 
-const title = css`
-  font-size: 36px;
-  font-weight: 600;
-`
-
 const signupLink = css`
   text-decoration: none;
   font-size: 14px;
@@ -35,6 +31,7 @@ const signupLink = css`
 `
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate()
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
@@ -46,7 +43,8 @@ const LoginPage: React.FC = () => {
     setPassword(event.target.value)
   }
 
-  const loginHandler: MouseEventHandler<HTMLButtonElement> = async () => {
+  const loginHandler: MouseEventHandler<HTMLButtonElement> = async event => {
+    event.preventDefault()
     try {
       const credential: UserCredential = await signInWithEmailAndPassword(
         auth,
@@ -56,9 +54,20 @@ const LoginPage: React.FC = () => {
       const user = credential.user
 
       if (user) {
-        alert('Success')
         setEmail('')
         setPassword('')
+
+        // usersコレクションからログインユーザーの情報を取得する
+        const docRef = doc(db, 'users', user.uid)
+        const docSnap = await getDoc(docRef)
+        const userData = docSnap.data()!
+        if (!userData.name) {
+          // usersコレクションに名前が登録されてない場合、アカウントページへ遷移する
+          navigate('/account')
+        } else {
+          // usersコレクションに名前が登録されている場合、フレンズページへ遷移する
+          navigate('/friends')
+        }
       }
     } catch (error) {
       alert('Error')
@@ -68,27 +77,28 @@ const LoginPage: React.FC = () => {
   }
 
   return (
-    <section css={loginSection}>
-      <div css={flexBox}>
-        <div css={title}>Login</div>
-        <Input
-          modelValue={email}
-          type='text'
-          label='Email'
-          onUpdateModelValue={emailUpdate}
-        />
-        <Input
-          modelValue={password}
-          type='password'
-          label='Password'
-          onUpdateModelValue={passwordUpdate}
-        />
-        <Button onClick={loginHandler} child='Login' />
-        <Link css={signupLink} to={'/signup'}>
-          Signup
-        </Link>
-      </div>
-    </section>
+    <>
+      <form css={loginSection}>
+        <div css={flexBox}>
+          <Input
+            modelValue={email}
+            type='text'
+            label='Email'
+            onUpdateModelValue={emailUpdate}
+          />
+          <Input
+            modelValue={password}
+            type='password'
+            label='Password'
+            onUpdateModelValue={passwordUpdate}
+          />
+          <Button onClick={loginHandler} child='Login' />
+          <Link css={signupLink} to={'/signup'}>
+            Signup
+          </Link>
+        </div>
+      </form>
+    </>
   )
 }
 

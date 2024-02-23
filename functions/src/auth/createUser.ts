@@ -1,8 +1,6 @@
 import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 
-admin.initializeApp()
-
 export const createUser = functions
   .region('asia-northeast1')
   .https.onCall(async data => {
@@ -25,10 +23,12 @@ export const createUser = functions
       await userDocRef.set({
         id: uid,
         email: data.email,
+        name: data.name,
+        src: '',
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       })
 
-      return { success: true }
+      return uid
     } catch (error) {
       console.log(error)
       throw new functions.https.HttpsError(
