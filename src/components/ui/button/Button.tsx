@@ -7,7 +7,7 @@ const button = css`
   outline: none;
   font: inherit;
   color: inherit;
-  background: none;
+  background-color: var(--bg-white);
   cursor: pointer;
   border: solid 1px;
   width: 100%;
@@ -16,14 +16,22 @@ const button = css`
   font-weight: 600;
 `
 
+const modalButton = css`
+  background-color: var(--bg-black);
+  color: var(--text-white);
+  max-width: 390px;
+  width: calc(100vw - 32px);
+`
+
 interface ButtonProps {
   onClick: MouseEventHandler<HTMLButtonElement>
   child: React.ReactNode
+  modal?: boolean
 }
 
-const Button: React.FC<ButtonProps> = ({ onClick, child }) => {
+const Button: React.FC<ButtonProps> = ({ onClick, child, modal = false }) => {
   return (
-    <button css={button} onClick={onClick}>
+    <button css={[button, modal ? modalButton : null]} onClick={onClick}>
       {child}
     </button>
   )

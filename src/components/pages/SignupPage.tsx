@@ -1,11 +1,12 @@
 /** @jsxImportSource @emotion/react */
 import React, { ChangeEvent, MouseEventHandler, useState, useRef } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { css } from '@emotion/react'
 import '../../assets/css/variable.css'
 import { validationCheck } from '../../utils/helpers/validation'
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
+import Spinner from '../ui/modal/Spinner'
 import { functions } from '../../firebase'
 import { httpsCallable } from 'firebase/functions'
 import { storage } from '../../firebase'
@@ -44,13 +45,12 @@ const loginLink = css`
   text-decoration: none;
   font-size: 14px;
   font-weight: 600;
-  color: #000;
+  color: var(--text-black);
   cursor: pointer;
   text-align: center;
 `
 
 const SignupPage: React.FC = () => {
-  const navigate = useNavigate()
   const [src, setSrc] = useState('noimage.png')
   const [fileObject, setFileObject] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -62,6 +62,10 @@ const SignupPage: React.FC = () => {
   const [nameError, setNameError] = useState<boolean>(false)
   const [emailError, setEmailError] = useState<boolean>(false)
   const [passwordError, setPasswordError] = useState<boolean>(false)
+
+  const [modalState, setModalState] = useState<boolean>(false)
+  const [spinnerState, setSpinnerState] = useState<boolean>(true)
+  const [modalMessage, setModalMessage] = useState<string>('')
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -93,6 +97,7 @@ const SignupPage: React.FC = () => {
   const signupHandler: MouseEventHandler<HTMLButtonElement> = async event => {
     event.preventDefault()
 
+    // 入力チェックを実行する
     setFileError(validationCheck('', fileObject, 'file'))
     setNameError(validationCheck(name, null, 'name'))
     setEmailError(validationCheck(email, null, 'email'))
@@ -110,6 +115,10 @@ const SignupPage: React.FC = () => {
     )
       return
 
+    // モーダルを展開する
+    setModalState(true)
+
+    // Firebase処理を実行する
     try {
       // Firebase Cloud Functionsを呼び出す
       // Authにユーザー情報を登録し、Firestoreにユーザー情報を保存する
@@ -127,29 +136,52 @@ const SignupPage: React.FC = () => {
         const srcUrl = await uploadFile(storage, `users/${uid}`, fileObject!)
 
         // ユーザー情報を更新する
-        const uploadUserFunction = httpsCallable(functions, 'uploadUser')
-        const uploadUserResult = await uploadUserFunction({
+        const updateUserFunction = httpsCallable(functions, 'updateUser')
+        const updateUserResult = await updateUserFunction({
           id: uid,
           src: srcUrl
         })
 
-        const data = uploadUserResult.data as { success: boolean }
+        const data = updateUserResult.data as { success: boolean }
 
+        // 全ての情報保存処理が成功した場合、スピナーを停止する
         if (data.success) {
-          navigate('/')
-          setSrc('noimage.png')
-          setName('')
-          setEmail('')
-          setPassword('')
+          setSpinnerState(false)
+          setModalMessage('Completion!!')
         }
       }
     } catch (error) {
-      alert('Error')
+      setSpinnerState(false)
+      setModalMessage('')
+    }
+  }
+
+  // モーダルのcloseボタンを押下した際に、以下の処理を実行する
+  const modalCloseHandler = () => {
+    setModalState(false)
+    setSpinnerState(true)
+    setModalMessage('')
+    if (!modalMessage) {
+      setFileError(true)
+      setNameError(true)
+      setEmailError(true)
+      setPasswordError(true)
+    } else {
+      setSrc('noimage.png')
+      setName('')
+      setEmail('')
+      setPassword('')
     }
   }
 
   return (
     <>
+      <Spinner
+        modalToggle={modalState}
+        sppinerToggle={spinnerState}
+        modalMessage={modalMessage}
+        onClose={modalCloseHandler}
+      />
       <form css={signupSection}>
         <div css={flexBox}>
           <img
@@ -170,6 +202,7 @@ const SignupPage: React.FC = () => {
             type='text'
             label='Name'
             error={nameError}
+            icon=''
             onUpdateModelValue={nameUpdate}
           />
           <Input
@@ -177,6 +210,7 @@ const SignupPage: React.FC = () => {
             type='text'
             label='Email'
             error={emailError}
+            icon=''
             onUpdateModelValue={emailUpdate}
           />
           <Input
@@ -184,6 +218,7 @@ const SignupPage: React.FC = () => {
             type='password'
             label='Password'
             error={passwordError}
+            icon='password'
             onUpdateModelValue={passwordUpdate}
           />
           <Button onClick={signupHandler} child='Signup' />
