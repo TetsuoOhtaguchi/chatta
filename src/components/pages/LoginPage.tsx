@@ -1,6 +1,13 @@
 /** @jsxImportSource @emotion/react */
-import React, { ChangeEvent, MouseEventHandler, useState } from 'react'
+import React, {
+  ChangeEvent,
+  MouseEventHandler,
+  useEffect,
+  useState,
+  useContext
+} from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../context/auth/AuthProvider'
 import { css } from '@emotion/react'
 import { validationCheck } from '../../utils/helpers/validation'
 import Button from '../ui/button/Button'
@@ -33,6 +40,15 @@ const signupLink = css`
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
+  const { currentUser } = useContext(AuthContext)
+
+  useEffect(() => {
+    // ログインしている場合、FriendsPageへリダイレクトする
+    if (currentUser) {
+      navigate('/friends')
+    }
+  }, [currentUser, navigate])
+
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 

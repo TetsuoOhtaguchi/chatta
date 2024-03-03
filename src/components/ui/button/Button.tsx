@@ -9,7 +9,7 @@ const button = css`
   color: inherit;
   background-color: var(--bg-white);
   cursor: pointer;
-  border: solid 1px;
+  border: solid 1px var(--border-black);
   width: 100%;
   height: 36px;
   font-size: 14px;
@@ -21,6 +21,7 @@ const modalButton = css`
   color: var(--text-white);
   max-width: 390px;
   width: calc(100vw - 32px);
+  border: solid 1px var(--border-white);
 `
 
 interface ButtonProps {
