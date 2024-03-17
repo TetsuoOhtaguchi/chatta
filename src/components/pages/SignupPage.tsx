@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import React, { ChangeEvent, MouseEventHandler, useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { css } from '@emotion/react'
@@ -23,6 +22,7 @@ const flexBox = css`
   display: flex;
   flex-direction: column;
   gap: 40px;
+  width: var(--page-width);
 `
 
 const profileImageStyle = css`
@@ -35,6 +35,7 @@ const profileImageStyle = css`
   object-fit: cover;
   vertical-align: top;
   margin: 0 auto;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `
 
 const profileImageErrorStyle = css`
@@ -44,7 +45,7 @@ const profileImageErrorStyle = css`
 const loginLink = css`
   text-decoration: none;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--font-weight);
   color: var(--text-black);
   cursor: pointer;
   text-align: center;

@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import React, { MouseEventHandler } from 'react'
 import { css } from '@emotion/react'
 
@@ -13,7 +12,8 @@ const button = css`
   width: 100%;
   height: 36px;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--font-weight);
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `
 
 const modalButton = css`

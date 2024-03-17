@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import React, {
   ChangeEvent,
   MouseEventHandler,
@@ -27,12 +26,13 @@ const flexBox = css`
   display: flex;
   flex-direction: column;
   gap: 40px;
+  width: var(--page-width);
 `
 
 const signupLink = css`
   text-decoration: none;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--font-weight);
   color: var(--text-black);
   cursor: pointer;
   text-align: center;
@@ -89,7 +89,7 @@ const LoginPage: React.FC = () => {
       const user = credential.user
 
       if (user) {
-        navigate('/friends')
+        navigate(`/friends?uid=${user.uid}`)
         setEmail('')
         setPassword('')
         setModalState(false)

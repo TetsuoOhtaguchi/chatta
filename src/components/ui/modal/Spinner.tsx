@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import React from 'react'
 import { css } from '@emotion/react'
 import Button from '../button/Button'
@@ -45,7 +44,7 @@ const modal__completion = css`
 const modal__message__text = css`
   color: var(--text-white);
   font-size: 24px;
-  font-weight: 600;
+  font-weight: var(--font-weight);
   text-align: center;
 `
 

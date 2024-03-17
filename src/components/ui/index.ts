@@ -1,5 +1,5 @@
-// button
 export * from './button/Button'
-
-// input
+export * from './header/Header'
 export * from './input/Input'
+export * from './modal/Spinner'
+export * from './modal/Confirmatory'
