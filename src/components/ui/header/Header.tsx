@@ -6,6 +6,7 @@ import { useWindowWidth } from '../../../utils/helpers/resize'
 import Confirmatory from '../modal/Confirmatory'
 import { auth } from '../../../firebase'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { ProceedChild } from '../../../types'
 
 const header = css`
   position: fixed;
@@ -18,7 +19,7 @@ const header = css`
   padding: 0 16px;
 `
 
-const title = css`
+const headerTitle = css`
   color: var(--text-black);
   font-weight: var(--font-weight);
 `
@@ -61,22 +62,24 @@ const menuListItem = css`
 
 const Header: React.FC = () => {
   const navigate = useNavigate()
-  const location = useLocation()
+  const isLocation = useLocation()
 
-  const [headerTitle, setHeaderTitle] = useState('')
+  const [isProceedChild, setProceedChild] = useState<ProceedChild>('')
+  const [isModalState, setModalState] = useState(false)
+  const [isModalMessage, setModalMessage] = useState('')
 
-  const [menuState, setMenuState] = useState(false)
-  const [menuListStyle, setMenuListStyle] = useState(menuList)
-  const [menuListItemStyle, setMenuListItemStyle] = useState(menuListItem)
+  const [isHeaderTitle, setHeaderTitle] = useState('')
 
-  const [logoutModalState, setLogoutModalState] = useState(false)
+  const [isMenuState, setMenuState] = useState(false)
+  const [isMenuListStyle, setMenuListStyle] = useState(menuList)
+  const [isMenuListItemStyle, setMenuListItemStyle] = useState(menuListItem)
 
-  const [appWidth, setAppWidth] = useState(0)
+  const [isAppWidth, setAppWidth] = useState(0)
   const windowWidth = useWindowWidth()
 
   useEffect(() => {
-    if (location.pathname.includes('/friends')) setHeaderTitle('Friends')
-  }, [location])
+    if (isLocation.pathname.includes('/friends')) setHeaderTitle('Friends')
+  }, [isLocation])
 
   useEffect(() => {
     if (windowWidth <= 390) {
@@ -88,17 +91,17 @@ const Header: React.FC = () => {
 
   // メニューを開くまたは閉じる
   const menuOpenAndCloseHandler = () => {
-    const newMenuState = !menuState
-    setMenuState(newMenuState)
+    const isNewMenuState = !isMenuState
+    setMenuState(isNewMenuState)
 
-    if (!newMenuState) {
+    if (!isNewMenuState) {
       // 閉じる場合
       setMenuListStyle(css`
         background-color: var(--bg-blackRgb);
         animation: slideOut 0.5s forwards;
         position: absolute;
         top: 40px;
-        right: ${appWidth}px;
+        right: ${isAppWidth}px;
         height: calc(100vh - 40px);
         padding: 16px 0;
       `)
@@ -112,7 +115,7 @@ const Header: React.FC = () => {
         animation: slideIn 0.5s forwards;
         position: absolute;
         top: 40px;
-        right: ${appWidth}px;
+        right: ${isAppWidth}px;
         height: calc(100vh - 40px);
         padding: 16px 0;
       `)
@@ -134,52 +137,63 @@ const Header: React.FC = () => {
     }
   }
 
-  // ログアウトモーダルを開く
-  const logoutModalOpenHandler = () => {
-    setLogoutModalState(true)
-  }
+  // 確認モーダルを開く
+  const modalOpenHandler = (proceedChild: ProceedChild) => {
+    setModalState(true)
+    setProceedChild(proceedChild)
 
-  // ログアウトモーダルを閉じる
-  const logoutModalCloseHandler = () => {
-    setLogoutModalState(false)
-  }
-
-  // ログアウトを実行する
-  const logoutSubmitHandler = async () => {
-    try {
-      // モーダルを閉じる
-      setLogoutModalState(false)
-      // メニューを閉じる
-      setMenuState(false)
-      setMenuListStyle(css`
-        display: none;
-      `)
-      setMenuListItemStyle(css`
-        display: none;
-      `)
-      await auth.signOut()
-      navigate('/')
-    } catch (error) {
-      console.error('ログアウト中にエラーが発生しました: ', error)
-      alert('ログアウト中にエラーが発生しました。もう一度お試しください。')
+    // proceedChildごとにメッセージの値を変更する
+    if (proceedChild === 'Logout') {
+      setModalMessage('Would you like to logout?')
     }
   }
 
-  return location.pathname !== '/' ? (
+  // 確認モーダルを閉じる
+  const modalCloseHandler = () => {
+    setModalState(false)
+    setProceedChild('')
+    setModalMessage('')
+  }
+
+  // 確認モーダルの処理を実行する
+  const modalSubmitHandler = async (proceedChild: ProceedChild) => {
+    // ログイン処理を行う
+    if (proceedChild === 'Logout') {
+      try {
+        // 確認モーダルを閉じる
+        setModalState(false)
+        // メニューを閉じる
+        setMenuState(false)
+        setMenuListStyle(css`
+          display: none;
+        `)
+        setMenuListItemStyle(css`
+          display: none;
+        `)
+        await auth.signOut()
+        navigate('/')
+      } catch (error) {
+        console.error('ログアウト中にエラーが発生しました: ', error)
+        alert('ログアウト中にエラーが発生しました。もう一度お試しください。')
+      }
+    }
+  }
+
+  return isLocation.pathname !== '/' ? (
     <div>
-      {/* ログアウト確認モーダル */}
+      {/* 確認モーダル */}
       <Confirmatory
-        proceedChild='Logout'
-        modalState={logoutModalState}
-        message='Would you like to logout?'
-        onCancel={logoutModalCloseHandler}
-        onSubmit={logoutSubmitHandler}
+        proceedChild={isProceedChild}
+        modalState={isModalState}
+        message={isModalMessage}
+        onCancel={modalCloseHandler}
+        onSubmit={() => modalSubmitHandler(isProceedChild)}
       />
 
       {/* ヘッダー */}
       <header css={header}>
-        <h1 css={title}>{headerTitle}</h1>
-        {menuState ? (
+        <h1 css={headerTitle}>{isHeaderTitle}</h1>
+        {isMenuState ? (
           <Close css={menuIcon} onClick={menuOpenAndCloseHandler} />
         ) : (
           <Menu css={menuIcon} onClick={menuOpenAndCloseHandler} />
@@ -188,8 +202,11 @@ const Header: React.FC = () => {
 
       {/* メニュー */}
       <nav>
-        <ul css={menuListStyle}>
-          <li css={menuListItemStyle} onClick={logoutModalOpenHandler}>
+        <ul css={isMenuListStyle}>
+          <li
+            css={isMenuListItemStyle}
+            onClick={() => modalOpenHandler('Logout')}
+          >
             Logout
           </li>
         </ul>

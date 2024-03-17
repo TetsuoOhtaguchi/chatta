@@ -1,9 +1,10 @@
 import React from 'react'
 import { css } from '@emotion/react'
 import Button from '../button/Button'
+import { ProceedChild } from '../../../types'
 
 interface ConfirmatoryProps {
-  proceedChild: 'Logout'
+  proceedChild: ProceedChild
   modalState: boolean
   message: string
   onCancel: () => void
