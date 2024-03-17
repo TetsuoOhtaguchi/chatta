@@ -1,6 +1,7 @@
 :root {
   --text-black: #000000;
   --text-white: #ffffff;
+  --text-hover: #bebebe;
 
   --bg-black: #000000;
   --bg-white: #ffffff;
@@ -10,4 +11,8 @@
 
   --border-black: #000000;
   --border-white: #ffffff;
+
+  --font-weight: 600;
+
+  --page-width: calc(100% - 36px);
 }

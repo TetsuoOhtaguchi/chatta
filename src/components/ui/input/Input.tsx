@@ -1,4 +1,3 @@
-/** @jsxImportSource @emotion/react */
 import React, { ChangeEvent, useState } from 'react'
 import { css } from '@emotion/react'
 import Visibility from '@mui/icons-material/Visibility'
@@ -36,7 +35,7 @@ const inputWrapper = css`
 
 const labelStyle = css`
   font-size: 14px;
-  font-weight: 600;
+  font-weight: var(--font-weight);
 `
 
 const input = css`
@@ -66,6 +65,7 @@ const iconStyle = css`
   bottom: 4px;
   right: 8px;
   cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `
 
 const Input: React.FC<InputProps> = ({

@@ -1,11 +1,4 @@
-/** @jsxImportSource @emotion/react */
-import React, {
-  MouseEventHandler,
-  useState,
-  useEffect,
-  useContext,
-  useRef
-} from 'react'
+import React, { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthContext } from '../../context/auth/AuthProvider'
 // import { css } from '@emotion/react'
@@ -55,18 +48,6 @@ const FriendsPage: React.FC = () => {
     setModalMessage('')
   }
 
-  const handleLogout: MouseEventHandler<HTMLButtonElement> = async event => {
-    event.preventDefault()
-
-    try {
-      await auth.signOut()
-      navigate('/')
-      console.log('ログアウトしました')
-    } catch (error) {
-      console.error('ログアウトに失敗しました', error)
-    }
-  }
-
   return (
     <>
       <Spinner
@@ -75,8 +56,6 @@ const FriendsPage: React.FC = () => {
         modalMessage={modalMessage}
         onClose={modalCloseHandler}
       />
-
-      <button onClick={handleLogout}>logout</button>
     </>
   )
 }
