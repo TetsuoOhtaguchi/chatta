@@ -11,6 +11,7 @@ interface SpinnerProps {
 
 const modal = css`
   position: fixed;
+  top: 0;
   left: 0;
   background: var(--bg-blackRgb);
   width: 100vw;

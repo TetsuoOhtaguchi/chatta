@@ -10,6 +10,7 @@ import { ProceedChild } from '../../../types'
 
 const header = css`
   position: fixed;
+  top: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -17,6 +18,7 @@ const header = css`
   width: 100%;
   height: 40px;
   padding: 0 16px;
+  background-color: var(--bg-white);
 `
 
 const headerTitle = css`
