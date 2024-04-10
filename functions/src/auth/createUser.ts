@@ -20,11 +20,13 @@ export const createUser = functions
 
       // Firestoreへユーザー情報を登録する
       const userDocRef = admin.firestore().doc(`users/${uid}`)
+
       await userDocRef.set({
         id: uid,
         email: data.email,
         name: data.name,
         src: '',
+        friends: [],
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       })
 

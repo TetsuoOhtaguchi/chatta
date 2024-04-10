@@ -2,16 +2,20 @@
 import emotionRset from 'emotion-reset'
 import { Global, css } from '@emotion/react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { AuthProvider } from './context/auth/AuthProvider'
+import { LoginUserProvider } from './context/users/LoginUserProvider'
+import { FriendsProvider } from './context/users/FriendsProvider'
 import LoginPage from './components/pages/LoginPage'
 import SignupPage from './components/pages/SignupPage'
 import FriendsPage from './components/pages/FriendsPage'
 import Header from './components/ui/header/Header'
+import buildProvidersTree from './utils/buildProvidersTree'
+
+const ProviderTree = buildProvidersTree([LoginUserProvider, FriendsProvider])
 
 function App () {
   return (
     <Router>
-      <AuthProvider>
+      <ProviderTree>
         <Global
           styles={css`
             ${emotionRset}
@@ -20,7 +24,6 @@ function App () {
               box-sizing: border-box;
               -moz-osx-font-smoothing: grayscale;
               -webkit-font-smoothing: antialiased;
-              font-smoothing: antialiased;
             }
           `}
         />
@@ -30,7 +33,7 @@ function App () {
           <Route path='/signup' element={<SignupPage />} />
           <Route path='/friends' element={<FriendsPage />} />
         </Routes>
-      </AuthProvider>
+      </ProviderTree>
     </Router>
   )
 }
