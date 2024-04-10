@@ -181,7 +181,10 @@ const Header: React.FC = () => {
     }
   }
 
-  return isLocation.pathname !== '/' ? (
+  // ヘッダー表示フラグ true: 表示 / false: 非表示
+  const headerShowFlug = !/^(\/|\/signup)$/.test(isLocation.pathname)
+
+  return headerShowFlug ? (
     <div>
       {/* 確認モーダル */}
       <Confirmatory

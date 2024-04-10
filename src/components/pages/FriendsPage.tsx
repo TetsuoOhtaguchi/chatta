@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AuthContext } from '../../context/auth/AuthProvider'
+import { FriendsContext } from '../../context/users/FriendsProvider'
 import { css } from '@emotion/react'
-import 'firebase/auth'
 import { auth } from '../../firebase'
 import Spinner from '../ui/modal/Spinner'
+import { dateFormater } from '../../utils/helpers/dateFormater'
 
 const friendsListSection = css`
   margin-top: 56px;
@@ -17,7 +17,8 @@ const friendsList = css`
   gap: 16px;
 `
 
-const friendsList__items = css`
+const friendsList__list = css`
+  /* background-color: yellow; */
   display: flex;
   gap: 8px;
   align-items: center;
@@ -27,15 +28,25 @@ const friendsList__items = css`
   color: var(--text-black);
 `
 
-const friendsList__items__image = css`
+const friendsList__image = css`
   width: 40px;
   height: 40px;
   object-fit: cover;
   background-color: var(--bg-grey);
   border-radius: 50px;
+  flex-shrink: 0;
 `
 
-const friendsList__items__details = css`
+const friendsList__itemWrapper = css`
+  /* background-color: red; */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+`
+
+const friendsList__nameAndMessage__container = css`
+  /* background-color: skyblue; */
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -43,7 +54,7 @@ const friendsList__items__details = css`
   max-width: 240px;
 `
 
-const friendsList__items__name = css`
+const friendsList__name = css`
   font-size: 12px;
   font-weight: 600;
   color: var(--text-black);
@@ -51,7 +62,7 @@ const friendsList__items__name = css`
   overflow: hidden;
 `
 
-const friendsList__items__message = css`
+const friendsList__message = css`
   word-wrap: break-word;
   overflow: hidden;
   max-height: 2.8em;
@@ -62,33 +73,39 @@ const friendsList__items__message = css`
   color: var(--text-gray);
 `
 
-const friendsList__items__time = css`
+const friendsList__messageTime = css`
   width: 62px;
   font-size: 10px;
   color: var(--text-gray);
+  text-align: right;
 `
 
 const FriendsPage: React.FC = () => {
   const navigate = useNavigate()
-  const { currentUser } = useContext(AuthContext)
+  const friends = useContext(FriendsContext)
 
   const [modalState, setModalState] = useState<boolean>(true)
   const [spinnerState, setSpinnerState] = useState<boolean>(true)
-  const [modalMessage, setModalMessage] = useState<string>('')
+  const [modalSppinerMessage, setModalSppinerMessage] = useState<string>('')
+  const [modalCompletionMessage, setModalCompletionMessage] =
+    useState<string>('')
 
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    // ログインしている場合: true / ログインしていない場合: false
-    const loginState = currentUser ? true : false
+    // 読み込みステート
+    const loadingState = friends ? true : false
 
-    setModalState(loginState ? false : true)
+    // 読み込み中の場合、スピナーモーダルを表示させる
+    setModalState(loadingState ? false : true)
+    setModalSppinerMessage(loadingState ? '' : 'Loading')
 
     timeoutIdRef.current = setTimeout(() => {
       // 10秒経過後、ログインステータスがfalseの場合エラー表示する
-      if (!loginState) {
+      if (!loadingState) {
         setSpinnerState(false)
-        setModalMessage('Error!!')
+        setModalSppinerMessage('')
+        setModalCompletionMessage('Error!!')
       }
     }, 10000)
 
@@ -99,7 +116,7 @@ const FriendsPage: React.FC = () => {
         clearTimeout(timeoutIdRef.current)
       }
     }
-  }, [currentUser])
+  }, [friends])
 
   // モーダルのcloseボタンを押下した際に、以下の処理を実行する
   const modalCloseHandler = async () => {
@@ -107,7 +124,8 @@ const FriendsPage: React.FC = () => {
     navigate('/')
     setModalState(true)
     setSpinnerState(true)
-    setModalMessage('')
+    setModalSppinerMessage('')
+    setModalCompletionMessage('')
   }
 
   return (
@@ -115,36 +133,37 @@ const FriendsPage: React.FC = () => {
       <Spinner
         modalToggle={modalState}
         sppinerToggle={spinnerState}
-        modalMessage={modalMessage}
+        modalSppinerMessage={modalSppinerMessage}
+        modalCompletionMessage={modalCompletionMessage}
         onClose={modalCloseHandler}
       />
 
       <section css={friendsListSection}>
-        <ul css={friendsList}>
-          <li css={friendsList__items}>
-            <img src='../noimage.png' alt='' css={friendsList__items__image} />
-            <div css={friendsList__items__details}>
-              <span css={friendsList__items__name}>
-                山田太郎山田太郎山田太郎山田太郎山田太郎山田太郎
-              </span>
-              <p css={friendsList__items__message}>
-                テストテキストテストテキストテストテキストテストテキストテストテキストテストテキスト
-              </p>
-            </div>
-            <time css={friendsList__items__time}>2024/03/21</time>
-          </li>
+        {friends?.length ? (
+          <ul css={friendsList}>
+            {friends.map(friend => (
+              <li key={friend.id} css={friendsList__list}>
+                <img src={friend.src} alt='' css={friendsList__image} />
 
-          <li css={friendsList__items}>
-            <img src='../noimage.png' alt='' css={friendsList__items__image} />
-            <div css={friendsList__items__details}>
-              <span css={friendsList__items__name}>山田太郎</span>
-              <p css={friendsList__items__message}>
-                テストテキストテストテキストテストテキストテストテキストテストテキストテストテキスト
-              </p>
-            </div>
-            <time css={friendsList__items__time}>2024/03/21</time>
-          </li>
-        </ul>
+                {friend.messages[0].message ? (
+                  <div css={friendsList__itemWrapper}>
+                    <div css={friendsList__nameAndMessage__container}>
+                      <span css={friendsList__name}>{friend.name}</span>
+                      <p css={friendsList__message}>
+                        {friend.messages[0].message}
+                      </p>
+                    </div>
+                    <time css={friendsList__messageTime}>
+                      {dateFormater(friend.messages[0].createdAt)}
+                    </time>
+                  </div>
+                ) : (
+                  <p css={friendsList__message}>No message</p>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
     </>
   )

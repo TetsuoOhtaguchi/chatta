@@ -5,11 +5,12 @@ import Button from '../button/Button'
 interface SpinnerProps {
   modalToggle: boolean
   sppinerToggle?: boolean
-  modalMessage: string
+  modalSppinerMessage: string
+  modalCompletionMessage: string
   onClose: () => void
 }
 
-const modal = css`
+const modal__wrapper = css`
   position: fixed;
   top: 0;
   left: 0;
@@ -36,13 +37,13 @@ const modal__spinner = css`
   }
 `
 
-const modal__completion = css`
+const modal__items__wrapper = css`
   display: flex;
   flex-direction: column;
   gap: 48px;
 `
 
-const modal__message__text = css`
+const modal__message = css`
   color: var(--text-white);
   font-size: 24px;
   font-weight: var(--font-weight);
@@ -52,17 +53,21 @@ const modal__message__text = css`
 const Spinner: React.FC<SpinnerProps> = ({
   modalToggle,
   sppinerToggle = true,
-  modalMessage,
+  modalSppinerMessage,
+  modalCompletionMessage,
   onClose
 }) => {
   return modalToggle ? (
-    <div css={modal}>
+    <div css={modal__wrapper}>
       {sppinerToggle ? (
-        <div css={modal__spinner} />
+        <div css={modal__items__wrapper}>
+          <span css={modal__message}>{modalSppinerMessage}</span>
+          <div css={modal__spinner} />
+        </div>
       ) : (
-        <div css={modal__completion}>
-          <span css={modal__message__text}>
-            {modalMessage ? modalMessage : 'Error!!'}
+        <div css={modal__items__wrapper}>
+          <span css={modal__message}>
+            {modalCompletionMessage ? modalCompletionMessage : 'Error!!'}
           </span>
           <Button modal onClick={onClose} child='Close' />
         </div>

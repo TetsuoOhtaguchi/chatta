@@ -66,7 +66,9 @@ const SignupPage: React.FC = () => {
 
   const [modalState, setModalState] = useState<boolean>(false)
   const [spinnerState, setSpinnerState] = useState<boolean>(true)
-  const [modalMessage, setModalMessage] = useState<string>('')
+  const [modalSppinerMessage, setModalSppinerMessage] = useState<string>('')
+  const [modalCompletionMessage, setModalCompletionMessage] =
+    useState<string>('')
 
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
@@ -118,6 +120,7 @@ const SignupPage: React.FC = () => {
 
     // モーダルを展開する
     setModalState(true)
+    setModalSppinerMessage('New registration')
 
     // Firebase処理を実行する
     try {
@@ -148,12 +151,14 @@ const SignupPage: React.FC = () => {
         // 全ての情報保存処理が成功した場合、スピナーを停止する
         if (data.success) {
           setSpinnerState(false)
-          setModalMessage('Completion!!')
+          setModalSppinerMessage('')
+          setModalCompletionMessage('Completion!!')
         }
       }
     } catch (error) {
       setSpinnerState(false)
-      setModalMessage('')
+      setModalSppinerMessage('')
+      setModalCompletionMessage('')
     }
   }
 
@@ -161,8 +166,9 @@ const SignupPage: React.FC = () => {
   const modalCloseHandler = () => {
     setModalState(false)
     setSpinnerState(true)
-    setModalMessage('')
-    if (!modalMessage) {
+    setModalSppinerMessage('')
+    setModalCompletionMessage('')
+    if (!modalCompletionMessage) {
       setFileError(true)
       setNameError(true)
       setEmailError(true)
@@ -180,7 +186,8 @@ const SignupPage: React.FC = () => {
       <Spinner
         modalToggle={modalState}
         sppinerToggle={spinnerState}
-        modalMessage={modalMessage}
+        modalSppinerMessage={modalSppinerMessage}
+        modalCompletionMessage={modalCompletionMessage}
         onClose={modalCloseHandler}
       />
       <form css={signupSection}>

@@ -14,6 +14,7 @@ interface ConfirmatoryProps {
 const modal = css`
   position: fixed;
   z-index: 10;
+  top: 0;
   left: 0;
   background: var(--bg-blackRgb);
   width: 100vw;

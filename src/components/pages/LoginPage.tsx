@@ -6,7 +6,7 @@ import React, {
   useContext
 } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AuthContext } from '../../context/auth/AuthProvider'
+import { LoginUserContext } from '../../context/users/LoginUserProvider'
 import { css } from '@emotion/react'
 import { validationCheck } from '../../utils/helpers/validation'
 import Button from '../ui/button/Button'
@@ -40,14 +40,14 @@ const signupLink = css`
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
-  const { currentUser } = useContext(AuthContext)
+  const loginUser = useContext(LoginUserContext)
 
   useEffect(() => {
     // ログインしている場合、FriendsPageへリダイレクトする
-    if (currentUser) {
+    if (loginUser) {
       navigate('/friends')
     }
-  }, [currentUser, navigate])
+  }, [loginUser, navigate])
 
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -57,7 +57,9 @@ const LoginPage: React.FC = () => {
 
   const [modalState, setModalState] = useState<boolean>(false)
   const [spinnerState, setSpinnerState] = useState<boolean>(true)
-  const [modalMessage, setModalMessage] = useState<string>('')
+  const [modalSppinerMessage, setModalSppinerMessage] = useState<string>('')
+  const [modalCompletionMessage, setModalCompletionMessage] =
+    useState<string>('')
 
   const emailUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     setEmail(event.target.value)
@@ -79,6 +81,7 @@ const LoginPage: React.FC = () => {
 
     // モーダルを展開する
     setModalState(true)
+    setModalSppinerMessage('You are logged in')
 
     try {
       const credential: UserCredential = await signInWithEmailAndPassword(
@@ -96,7 +99,8 @@ const LoginPage: React.FC = () => {
       }
     } catch (error) {
       setSpinnerState(false)
-      setModalMessage('')
+      setModalSppinerMessage('')
+      setModalCompletionMessage('')
     }
   }
 
@@ -104,6 +108,8 @@ const LoginPage: React.FC = () => {
   const modalCloseHandler = () => {
     setModalState(false)
     setSpinnerState(true)
+    setModalSppinerMessage('')
+    setModalCompletionMessage('')
 
     // メールアドレスとパスワードをエラー表示にする
     setEmailError(true)
@@ -115,7 +121,8 @@ const LoginPage: React.FC = () => {
       <Spinner
         modalToggle={modalState}
         sppinerToggle={spinnerState}
-        modalMessage={modalMessage}
+        modalSppinerMessage={modalSppinerMessage}
+        modalCompletionMessage={modalCompletionMessage}
         onClose={modalCloseHandler}
       />
       <form css={loginSection}>
