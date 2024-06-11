@@ -1,21 +1,7 @@
 import { createContext, useEffect, useState } from 'react'
 import { auth, db } from '../../firebase'
-import {
-  collection,
-  getDocs,
-  query,
-  Timestamp,
-  where
-} from 'firebase/firestore'
-
-interface User {
-  id: string
-  name: string
-  email: string
-  src: string
-  friends: string[]
-  createdAt: null | Date | Timestamp
-}
+import { collection, getDocs, query, where } from 'firebase/firestore'
+import { User } from '../../types/db/users/UserType'
 
 export const LoginUserContext = createContext<User | undefined>(undefined)
 

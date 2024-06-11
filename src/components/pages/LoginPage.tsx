@@ -6,7 +6,7 @@ import React, {
   useContext
 } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { LoginUserContext } from '../../context/users/LoginUserProvider'
+import { LoginUserContext } from '../../context/auth/LoginUserProvider'
 import { css } from '@emotion/react'
 import { validationCheck } from '../../utils/helpers/validation'
 import Button from '../ui/button/Button'
@@ -92,7 +92,7 @@ const LoginPage: React.FC = () => {
       const user = credential.user
 
       if (user) {
-        navigate(`/friends?uid=${user.uid}`)
+        navigate('/friends')
         setEmail('')
         setPassword('')
         setModalState(false)
