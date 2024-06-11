@@ -19,6 +19,7 @@ const modal__wrapper = css`
   height: 100vh;
   display: grid;
   place-items: center;
+  z-index: 100;
 `
 
 const modal__spinner = css`

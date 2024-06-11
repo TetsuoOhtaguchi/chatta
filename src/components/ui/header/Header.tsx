@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { css } from '@emotion/react'
 import Menu from '@mui/icons-material/Menu'
 import Close from '@mui/icons-material/Close'
+import { ArrowBackIos } from '@mui/icons-material'
 import { useWindowWidth } from '../../../utils/helpers/resize'
 import Confirmatory from '../modal/Confirmatory'
 import { auth } from '../../../firebase'
@@ -24,6 +25,13 @@ const header = css`
 const headerTitle = css`
   color: var(--text-black);
   font-weight: var(--font-weight);
+`
+
+const arrowBackIosIcon = css`
+  position: absolute;
+  left: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `
 
 const menuIcon = css`
@@ -80,7 +88,15 @@ const Header: React.FC = () => {
   const windowWidth = useWindowWidth()
 
   useEffect(() => {
-    if (isLocation.pathname.includes('/friends')) setHeaderTitle('Friends')
+    // ページごとにヘッダーのタイトルを変更する
+    if (isLocation.pathname.includes('/friends')) {
+      setHeaderTitle('Friends')
+    }
+    if (isLocation.pathname.includes('chatroom')) {
+      const searchParas = new URLSearchParams(isLocation.search)
+      const friendName = searchParas.get('friend')
+      setHeaderTitle(String(friendName))
+    }
   }, [isLocation])
 
   useEffect(() => {
@@ -197,12 +213,21 @@ const Header: React.FC = () => {
 
       {/* ヘッダー */}
       <header css={header}>
+        {isLocation.pathname !== '/friends' ? (
+          <ArrowBackIos css={arrowBackIosIcon} onClick={() => navigate(-1)} />
+        ) : null}
+
         <h1 css={headerTitle}>{isHeaderTitle}</h1>
-        {isMenuState ? (
-          <Close css={menuIcon} onClick={menuOpenAndCloseHandler} />
-        ) : (
-          <Menu css={menuIcon} onClick={menuOpenAndCloseHandler} />
-        )}
+
+        {isLocation.pathname === '/friends' ? (
+          <>
+            {isMenuState ? (
+              <Close css={menuIcon} onClick={menuOpenAndCloseHandler} />
+            ) : (
+              <Menu css={menuIcon} onClick={menuOpenAndCloseHandler} />
+            )}
+          </>
+        ) : null}
       </header>
 
       {/* メニュー */}
