@@ -26,7 +26,6 @@ export const createUser = functions
         email: data.email,
         name: data.name,
         src: '',
-        friends: [],
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       })
 

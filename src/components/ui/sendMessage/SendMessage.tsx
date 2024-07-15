@@ -10,10 +10,10 @@ interface SendMessageProps {
 }
 
 const sendMessage = css`
-  background-color: var(--bg-grey);
+  background-color: var(--bg-black);
   position: fixed;
-  left: 0;
   bottom: 0;
+  max-width: 390px;
   width: 100%;
   padding: 8px;
   display: flex;

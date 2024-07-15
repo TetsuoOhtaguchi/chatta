@@ -2,8 +2,13 @@ import { Timestamp } from 'firebase/firestore'
 
 export interface Message {
   id: string
-  sendUid: string
-  message: string
   createdAt: Timestamp
-  alreadyRead: boolean
+  message: string
+  sendUid: string
+}
+
+// Message型を拡張する
+export interface ExtendedMessage extends Message {
+  name?: string
+  src?: string
 }

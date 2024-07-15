@@ -5,30 +5,24 @@ export const addMessage = functions
   .region('asia-northeast1')
   .https.onCall(async data => {
     try {
-      // chatroomsコレクションへメッセージを保存する
-      if (!data.message) {
+      // messagesコレクションへ情報を追加する
+      if (!data) {
         throw new functions.https.HttpsError(
           'invalid-argument',
           'Message not specified'
         )
       }
 
-      const messageDocRef = admin
-        .firestore()
-        .collection('chatrooms')
-        .doc(data.key)
-        .collection('messages')
-        .doc()
+      const messagesDocRef = admin.firestore().collection('messages').doc()
 
-      await messageDocRef.set({
-        id: messageDocRef.id,
+      await messagesDocRef.set({
+        id: messagesDocRef.id,
         createdAt: admin.firestore.FieldValue.serverTimestamp(),
         message: data.message,
-        sendUid: data.sendUid,
-        alreadyRead: false
+        sendUid: data.sendUid
       })
 
-      return messageDocRef.id
+      return messagesDocRef.id
     } catch (error) {
       console.error('Error adding document: ', error)
       throw new functions.https.HttpsError(
