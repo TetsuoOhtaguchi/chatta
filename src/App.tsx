@@ -4,10 +4,9 @@ import { Global, css } from '@emotion/react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LoginUserProvider } from './context/auth/LoginUserProvider'
 import { UsersProvider } from './context/users/UsersProvider'
-import { ChatroomsProvider } from './context/chatrooms/ChatroomsProvider'
+import { MessagesProvider } from './context/messages/MessagesProvider'
 import LoginPage from './components/pages/LoginPage'
 import SignupPage from './components/pages/SignupPage'
-import FriendsPage from './components/pages/FriendsPage'
 import ChatroomPage from './components/pages/ChatroomPage'
 import Header from './components/ui/header/Header'
 import buildProvidersTree from './utils/buildProvidersTree'
@@ -15,7 +14,7 @@ import buildProvidersTree from './utils/buildProvidersTree'
 const ProviderTree = buildProvidersTree([
   LoginUserProvider,
   UsersProvider,
-  ChatroomsProvider
+  MessagesProvider
 ])
 
 function App () {
@@ -37,7 +36,6 @@ function App () {
         <Routes>
           <Route path='/' element={<LoginPage />} />
           <Route path='/signup' element={<SignupPage />} />
-          <Route path='/friends' element={<FriendsPage />} />
           <Route path='/chatroom' element={<ChatroomPage />} />
         </Routes>
       </ProviderTree>

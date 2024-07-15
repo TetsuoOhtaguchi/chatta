@@ -10,13 +10,13 @@ import { css } from '@emotion/react'
 import SendMessage from '../ui/sendMessage/SendMessage'
 import { LoginUserContext } from '../../context/auth/LoginUserProvider'
 import { UsersContext } from '../../context/users/UsersProvider'
-import { ChatroomsContext } from '../../context/chatrooms/ChatroomsProvider'
+import { MessagesContext } from '../../context/messages/MessagesProvider'
 import { auth, functions } from '../../firebase'
 import { httpsCallable } from 'firebase/functions'
 import Spinner from '../ui/modal/Spinner'
 import { dateFormater } from '../../utils/helpers/dateFormater'
 import { handlePostDate } from '../../utils/helpers/handlePostDate'
-import { MessageWithAdditionalInfo } from '../../types/db/messages/ExtendedMessageType'
+import { ExtendedMessage } from '../../types'
 
 const chatsListSection = css`
   margin-top: 40px;
@@ -34,6 +34,7 @@ const chatsList = css`
   flex-direction: column;
   gap: 16px;
   padding: 16px;
+  background-color: var(--bg-grey);
 `
 
 const chatsList__postDate = css`
@@ -48,14 +49,14 @@ const chatsList__postDate = css`
   border-radius: 50px;
 `
 
-const friendMessage__wrapper = css`
+const messages__wrapper = css`
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: fit-content;
 `
 
-const loginUserMessage__wrapper = css`
+const loginUserMessages__wrapper = css`
   position: relative;
   display: flex;
   gap: 4px;
@@ -71,7 +72,7 @@ const userImage = css`
   flex-shrink: 0;
 `
 
-const friendMessage__chatBalloonAndTime__wrapper = css`
+const messages__chatBalloonAndTime__wrapper = css`
   position: relative;
   display: flex;
   gap: 4px;
@@ -86,17 +87,17 @@ const chatBalloon = css`
   line-height: 1.5;
 `
 
-const friend__chatBalloon = css`
+const users__chatBalloon = css`
   background-color: var(--bg-black);
   color: var(--text-white);
 `
 
 const loginUser__chatBalloon = css`
-  background-color: var(--bg-grey);
+  background-color: var(--bg-white);
   color: var(--text-black);
 `
 
-const loginUserMessage__alreadyReadAndTime__wrapper = css`
+const loginUserMessages__alreadyReadAndTime__wrapper = css`
   position: absolute;
   bottom: 0;
   left: -34px;
@@ -113,7 +114,7 @@ const chatTime = css`
   font-size: 10px;
 `
 
-const friend__chatTime = css`
+const users__chatTime = css`
   position: absolute;
   bottom: 0;
   right: -34px;
@@ -139,16 +140,14 @@ const ChatroomPage: React.FC = () => {
 
   const loginUser = useContext(LoginUserContext)
   const users = useContext(UsersContext)
-  const chatrooms = useContext(ChatroomsContext)
+  const chatrooms = useContext(MessagesContext)
 
-  const [chatmessageList, setChatmessageList] = useState<
-    MessageWithAdditionalInfo[]
-  >([])
+  const [chatmessageList, setChatmessageList] = useState<ExtendedMessage[]>([])
 
   useEffect(() => {
-    if (!users) return
+    if (!loginUser) return
 
-    const loadingState = users ? true : false
+    const loadingState = loginUser ? true : false
 
     // 読み込み中の場合、スピナーモーダルを表示させる
     setModalState(loadingState ? false : true)
@@ -163,39 +162,18 @@ const ChatroomPage: React.FC = () => {
       }
     }, 10000)
 
-    const newMessages = users.map(user => {
-      return user.chatroomKeys.reduce((messages, chatroomKey: string) => {
-        if (chatroomKey === chatroomKeyParam) {
-          const chatroom = chatrooms?.find(
-            chatroom => chatroomKeyParam === chatroom.id
-          )
-
-          if (chatroom && chatroom.messages && chatroom.messages.length > 0) {
-            const updatedMessages = chatroom.messages.map(message => {
-              const updatedMessage: MessageWithAdditionalInfo = {
-                ...message,
-                src: '',
-                name: ''
-              }
-
-              if (updatedMessage.sendUid === loginUser?.id) {
-                updatedMessage.src = loginUser?.src
-                updatedMessage.name = loginUser?.name
-              } else {
-                updatedMessage.src = user.src
-                updatedMessage.name = user.name
-              }
-              return updatedMessage
-            })
-
-            messages.push(...updatedMessages)
-          }
+    const chatlist = chatrooms?.map(chat => {
+      const extendedChat = chat as ExtendedMessage
+      users?.find(user => {
+        if (user.id === chat.sendUid) {
+          extendedChat.name = user.name
+          extendedChat.src = user.src
         }
-        return messages
-      }, [] as MessageWithAdditionalInfo[])
+      })
+      return chat
     })
 
-    setChatmessageList(newMessages.flat())
+    setChatmessageList(chatlist as ExtendedMessage[])
 
     return () => {
       // timeoutIdRef.currentがnullでない場合
@@ -257,9 +235,8 @@ const ChatroomPage: React.FC = () => {
       // Firebase Cloud Functionsを呼び出す
       const addMessageFunction = httpsCallable(functions, 'addMessage')
 
-      // chatroomsコレクションにメッセージを保存する
+      // messagesコレクションにメッセージを保存する
       const addMessageResult = await addMessageFunction({
-        key: chatroomKeyParam,
         createdAt: new Date(),
         message: message,
         sendUid: loginUser?.id
@@ -307,25 +284,24 @@ const ChatroomPage: React.FC = () => {
                 ) : null}
 
                 {chatmessage.sendUid !== loginUser?.id ? (
-                  <div css={friendMessage__wrapper}>
+                  <div css={messages__wrapper}>
                     <img
                       css={userImage}
                       src={chatmessage.src}
                       alt='user image'
                     />
-                    <div css={friendMessage__chatBalloonAndTime__wrapper}>
-                      <p css={[chatBalloon, friend__chatBalloon]}>
+                    <div css={messages__chatBalloonAndTime__wrapper}>
+                      <p css={[chatBalloon, users__chatBalloon]}>
                         {newLineFormater(chatmessage.message)}
                       </p>
-                      <time css={[chatTime, friend__chatTime]}>
+                      <time css={[chatTime, users__chatTime]}>
                         {dateFormater(chatmessage.createdAt, 'hh/mm')}
                       </time>
                     </div>
                   </div>
                 ) : (
-                  <div css={loginUserMessage__wrapper}>
-                    <div css={loginUserMessage__alreadyReadAndTime__wrapper}>
-                      {chatmessage.alreadyRead ? <span>Read</span> : null}
+                  <div css={loginUserMessages__wrapper}>
+                    <div css={loginUserMessages__alreadyReadAndTime__wrapper}>
                       <time css={chatTime}>
                         {dateFormater(chatmessage.createdAt, 'hh/mm')}
                       </time>

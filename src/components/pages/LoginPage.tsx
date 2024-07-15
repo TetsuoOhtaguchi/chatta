@@ -43,9 +43,9 @@ const LoginPage: React.FC = () => {
   const loginUser = useContext(LoginUserContext)
 
   useEffect(() => {
-    // ログインしている場合、FriendsPageへリダイレクトする
+    // ログインしている場合、ChatroomPageへリダイレクトする
     if (loginUser) {
-      navigate('/friends')
+      navigate('/chatroom')
     }
   }, [loginUser, navigate])
 
@@ -92,7 +92,7 @@ const LoginPage: React.FC = () => {
       const user = credential.user
 
       if (user) {
-        navigate('/friends')
+        navigate('/chatroom')
         setEmail('')
         setPassword('')
         setModalState(false)

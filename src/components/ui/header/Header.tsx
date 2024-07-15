@@ -19,11 +19,11 @@ const header = css`
   width: 100%;
   height: 40px;
   padding: 0 16px;
-  background-color: var(--bg-white);
+  background-color: var(--bg-black);
 `
 
 const headerTitle = css`
-  color: var(--text-black);
+  color: var(--text-white);
   font-weight: var(--font-weight);
 `
 
@@ -38,6 +38,7 @@ const menuIcon = css`
   position: absolute;
   right: 16px;
   cursor: pointer;
+  color: var(--text-white);
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `
 
@@ -89,13 +90,8 @@ const Header: React.FC = () => {
 
   useEffect(() => {
     // ページごとにヘッダーのタイトルを変更する
-    if (isLocation.pathname.includes('/friends')) {
-      setHeaderTitle('Friends')
-    }
     if (isLocation.pathname.includes('chatroom')) {
-      const searchParas = new URLSearchParams(isLocation.search)
-      const friendName = searchParas.get('friend')
-      setHeaderTitle(String(friendName))
+      setHeaderTitle('Chatroom')
     }
   }, [isLocation])
 
@@ -118,6 +114,7 @@ const Header: React.FC = () => {
         background-color: var(--bg-blackRgb);
         animation: slideOut 0.5s forwards;
         position: absolute;
+        z-index: 5;
         top: 40px;
         right: ${isAppWidth}px;
         height: calc(100vh - 40px);
@@ -132,6 +129,7 @@ const Header: React.FC = () => {
         background-color: var(--bg-blackRgb);
         animation: slideIn 0.5s forwards;
         position: absolute;
+        z-index: 5;
         top: 40px;
         right: ${isAppWidth}px;
         height: calc(100vh - 40px);
@@ -213,13 +211,13 @@ const Header: React.FC = () => {
 
       {/* ヘッダー */}
       <header css={header}>
-        {isLocation.pathname !== '/friends' ? (
+        {isLocation.pathname !== '/chatroom' ? (
           <ArrowBackIos css={arrowBackIosIcon} onClick={() => navigate(-1)} />
         ) : null}
 
         <h1 css={headerTitle}>{isHeaderTitle}</h1>
 
-        {isLocation.pathname === '/friends' ? (
+        {isLocation.pathname === '/chatroom' ? (
           <>
             {isMenuState ? (
               <Close css={menuIcon} onClick={menuOpenAndCloseHandler} />

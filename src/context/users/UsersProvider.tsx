@@ -1,6 +1,6 @@
 import { createContext, useState, useContext, useEffect } from 'react'
 import { db } from '../../firebase'
-import { collection, query, where, onSnapshot } from 'firebase/firestore'
+import { collection, query, onSnapshot } from 'firebase/firestore'
 import { LoginUserContext } from '../auth/LoginUserProvider'
 import { User } from '../../types/db/users/UserType'
 
@@ -21,37 +21,24 @@ export const UsersProvider: React.FC<{ children: React.ReactNode }> = ({
       return
     }
 
-    const unsubscribeList: (() => void)[] = []
-
     const fetchUsersData = async () => {
       try {
-        loginUser.chatroomKeys.forEach(chatroomKey => {
-          const usersQuery = query(
-            collection(db, 'users'),
-            where('chatroomKeys', 'array-contains', chatroomKey),
-            where('id', '!=', loginUser.id)
-          )
+        const usersQuery = query(collection(db, 'users'))
 
-          const unsubscribe = onSnapshot(usersQuery, snapshot => {
-            const usersData = snapshot
-              .docChanges()
-              .map(change => change.doc.data() as User)
+        let usersData: User[] = []
 
-            setUsers(prevUsers => {
-              const newUsers = prevUsers
-                ? [...prevUsers, ...usersData]
-                : usersData
-              const uniqueUsers = Array.from(
-                new Map(newUsers.map(user => [user.id, user])).values()
-              )
-              return uniqueUsers
-            })
-            setLoadingState(false)
+        onSnapshot(usersQuery, snapshot => {
+          const newUsersData: User[] = []
+
+          snapshot.docChanges().forEach(change => {
+            if (change.type === 'added') {
+              const userData = change.doc.data() as User
+              newUsersData.push(userData)
+            }
           })
 
-          unsubscribeList.push(unsubscribe)
-
-          return () => unsubscribe()
+          usersData = [...usersData, ...newUsersData]
+          setUsers(usersData)
         })
       } catch (error) {
         console.error('Error fetching users data:', error)
