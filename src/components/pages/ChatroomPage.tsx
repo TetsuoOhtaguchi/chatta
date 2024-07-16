@@ -5,18 +5,25 @@ import React, {
   useRef,
   ChangeEvent
 } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+
+import { useNavigate } from 'react-router-dom'
+
 import { css } from '@emotion/react'
-import SendMessage from '../ui/sendMessage/SendMessage'
+
+import { auth, functions } from '../../firebase'
+import { httpsCallable } from 'firebase/functions'
+
 import { LoginUserContext } from '../../context/auth/LoginUserProvider'
 import { UsersContext } from '../../context/users/UsersProvider'
 import { MessagesContext } from '../../context/messages/MessagesProvider'
-import { auth, functions } from '../../firebase'
-import { httpsCallable } from 'firebase/functions'
-import Spinner from '../ui/modal/Spinner'
+
 import { dateFormater } from '../../utils/helpers/dateFormater'
 import { handlePostDate } from '../../utils/helpers/handlePostDate'
+
 import { ExtendedMessage } from '../../types'
+
+import SendMessage from '../ui/sendMessage/SendMessage'
+import Spinner from '../ui/modal/Spinner'
 
 const chatsListSection = css`
   margin-top: 40px;
@@ -24,6 +31,7 @@ const chatsListSection = css`
   overflow-y: scroll;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  background-color: var(--bg-grey);
   ::-webkit-scrollbar {
     display: none;
   }
@@ -32,28 +40,28 @@ const chatsListSection = css`
 const chatsList = css`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
   padding: 16px;
-  background-color: var(--bg-grey);
 `
 
 const chatsList__postDate = css`
   display: block;
   margin: 8px auto;
   width: fit-content;
-  font-size: 12px;
+  font-size: 10px;
   background-color: var(--bg-blackRgb);
   color: var(--text-white);
   font-weight: 600;
-  padding: 8px;
+  padding: 4px 8px;
   border-radius: 50px;
 `
 
 const messages__wrapper = css`
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: fit-content;
+  gap: 24px;
+  width: fit-content; ;
 `
 
 const loginUserMessages__wrapper = css`
@@ -65,11 +73,22 @@ const loginUserMessages__wrapper = css`
 `
 
 const userImage = css`
-  height: 40px;
-  width: 40px;
+  height: 36px;
+  width: 36px;
   object-fit: cover;
   border-radius: 50%;
   flex-shrink: 0;
+  margin-left: 24px;
+`
+
+const messages__name = css`
+  position: absolute;
+  z-index: 1;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text--black);
+  top: 40px;
+  left: 30px;
 `
 
 const messages__chatBalloonAndTime__wrapper = css`
@@ -82,7 +101,7 @@ const chatBalloon = css`
   max-width: calc(100vw / 1.5);
   width: fit-content;
   padding: 8px 16px;
-  border-radius: 4px;
+  border-radius: 15px;
   font-size: 14px;
   line-height: 1.5;
 `
@@ -90,11 +109,75 @@ const chatBalloon = css`
 const users__chatBalloon = css`
   background-color: var(--bg-black);
   color: var(--text-white);
+
+  ::before {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: rotate(45deg);
+    left: 10px;
+    top: -10px;
+    border-left: 20px solid var(--bg-black);
+    border-top: 20px solid var(--bg-black);
+    border-right: 20px solid transparent;
+    border-bottom: 20px solid transparent;
+  }
+
+  ::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: rotate(45deg);
+    left: 20px;
+    top: -15px;
+    border-left: 15px solid var(--bg-grey);
+    border-top: 15px solid var(--bg-grey);
+    border-right: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+  }
 `
 
 const loginUser__chatBalloon = css`
   background-color: var(--bg-white);
   color: var(--text-black);
+
+  ::before {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: rotate(225deg);
+    right: 14px;
+    top: 27px;
+    border-left: 9px solid var(--bg-white);
+    border-top: 9px solid var(--bg-white);
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+  }
+
+  ::after {
+    content: '';
+    position: absolute;
+    display: block;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    transform: rotate(225deg);
+    right: 6px;
+    top: 28px;
+    border-left: 9px solid var(--bg-grey);
+    border-top: 9px solid var(--bg-grey);
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid transparent;
+  }
 `
 
 const loginUserMessages__alreadyReadAndTime__wrapper = css`
@@ -134,10 +217,6 @@ const ChatroomPage: React.FC = () => {
 
   const [message, setMessage] = useState<string>('')
 
-  const location = useLocation().search
-  const locationQuery = new URLSearchParams(location)
-  const chatroomKeyParam = locationQuery.get('key')
-
   const loginUser = useContext(LoginUserContext)
   const users = useContext(UsersContext)
   const chatrooms = useContext(MessagesContext)
@@ -145,8 +224,6 @@ const ChatroomPage: React.FC = () => {
   const [chatmessageList, setChatmessageList] = useState<ExtendedMessage[]>([])
 
   useEffect(() => {
-    if (!loginUser) return
-
     const loadingState = loginUser ? true : false
 
     // 読み込み中の場合、スピナーモーダルを表示させる
@@ -182,12 +259,13 @@ const ChatroomPage: React.FC = () => {
         clearTimeout(timeoutIdRef.current)
       }
     }
-  }, [loginUser, chatroomKeyParam, users, chatrooms])
+  }, [loginUser, users, chatrooms])
 
   useEffect(() => {
-    // チャットリストが存在しない場合、即時リターンする
+    // チャットリストが存在しない場合、処理を終了する
     if (!chatsListRef.current) return
 
+    // チャットリストが存在する場合、最下部へ自動スクロールさせる
     chatsListRef.current.scrollIntoView(false)
   }, [chatmessageList])
 
@@ -207,7 +285,7 @@ const ChatroomPage: React.FC = () => {
 
   // モーダルのcloseボタンを押下した際に、以下の処理を実行する
   const modalCloseHandler = async () => {
-    if (modalState) {
+    if (modalState && loginUser) {
       // 送信処理が失敗した場合、以下の処理を実行する
       setModalState(false)
       setSpinnerState(true)
@@ -248,10 +326,12 @@ const ChatroomPage: React.FC = () => {
         setModalState(false)
         // textareaの値を空白にする
         setMessage('')
+
+        // チャットリストが存在しない場合、処理を終了する
+        if (!chatsListRef.current) return
+
         // チャットリストが存在する場合、最下部へ自動スクロールさせる
-        if (chatsListRef.current) {
-          chatsListRef.current.scrollIntoView(false)
-        }
+        chatsListRef.current.scrollIntoView(false)
       }
     } catch (error) {
       console.error(error)
@@ -290,6 +370,7 @@ const ChatroomPage: React.FC = () => {
                       src={chatmessage.src}
                       alt='user image'
                     />
+                    <span css={messages__name}>test</span>
                     <div css={messages__chatBalloonAndTime__wrapper}>
                       <p css={[chatBalloon, users__chatBalloon]}>
                         {newLineFormater(chatmessage.message)}
