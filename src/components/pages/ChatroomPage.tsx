@@ -17,13 +17,13 @@ import { LoginUserContext } from '../../context/auth/LoginUserProvider'
 import { UsersContext } from '../../context/users/UsersProvider'
 import { MessagesContext } from '../../context/messages/MessagesProvider'
 
-import { dateFormater } from '../../utils/helpers/dateFormater'
 import { handlePostDate } from '../../utils/helpers/handlePostDate'
 
 import { ExtendedMessage } from '../../types'
 
 import SendMessage from '../ui/sendMessage/SendMessage'
 import Spinner from '../ui/modal/Spinner'
+import Balloon from '../ui/balloon/Balloon'
 
 const chatsListSection = css`
   margin-top: 40px;
@@ -54,153 +54,6 @@ const chatsList__postDate = css`
   font-weight: 600;
   padding: 4px 8px;
   border-radius: 50px;
-`
-
-const messages__wrapper = css`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  width: fit-content; ;
-`
-
-const loginUserMessages__wrapper = css`
-  position: relative;
-  display: flex;
-  gap: 4px;
-  width: fit-content;
-  margin-left: auto;
-`
-
-const userImage = css`
-  height: 36px;
-  width: 36px;
-  object-fit: cover;
-  border-radius: 50%;
-  flex-shrink: 0;
-  margin-left: 24px;
-`
-
-const messages__name = css`
-  position: absolute;
-  z-index: 1;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text--black);
-  top: 40px;
-  left: 30px;
-`
-
-const messages__chatBalloonAndTime__wrapper = css`
-  position: relative;
-  display: flex;
-  gap: 4px;
-`
-
-const chatBalloon = css`
-  max-width: calc(100vw / 1.5);
-  width: fit-content;
-  padding: 8px 16px;
-  border-radius: 15px;
-  font-size: 14px;
-  line-height: 1.5;
-`
-
-const users__chatBalloon = css`
-  background-color: var(--bg-black);
-  color: var(--text-white);
-
-  ::before {
-    content: '';
-    position: absolute;
-    display: block;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    transform: rotate(45deg);
-    left: 10px;
-    top: -10px;
-    border-left: 20px solid var(--bg-black);
-    border-top: 20px solid var(--bg-black);
-    border-right: 20px solid transparent;
-    border-bottom: 20px solid transparent;
-  }
-
-  ::after {
-    content: '';
-    position: absolute;
-    display: block;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    transform: rotate(45deg);
-    left: 20px;
-    top: -15px;
-    border-left: 15px solid var(--bg-grey);
-    border-top: 15px solid var(--bg-grey);
-    border-right: 15px solid transparent;
-    border-bottom: 15px solid transparent;
-  }
-`
-
-const loginUser__chatBalloon = css`
-  background-color: var(--bg-white);
-  color: var(--text-black);
-
-  ::before {
-    content: '';
-    position: absolute;
-    display: block;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    transform: rotate(225deg);
-    right: 14px;
-    top: 27px;
-    border-left: 9px solid var(--bg-white);
-    border-top: 9px solid var(--bg-white);
-    border-right: 9px solid transparent;
-    border-bottom: 9px solid transparent;
-  }
-
-  ::after {
-    content: '';
-    position: absolute;
-    display: block;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    transform: rotate(225deg);
-    right: 6px;
-    top: 28px;
-    border-left: 9px solid var(--bg-grey);
-    border-top: 9px solid var(--bg-grey);
-    border-right: 9px solid transparent;
-    border-bottom: 9px solid transparent;
-  }
-`
-
-const loginUserMessages__alreadyReadAndTime__wrapper = css`
-  position: absolute;
-  bottom: 0;
-  left: -34px;
-  display: flex;
-  flex-direction: column;
-  font-size: 10px;
-  color: var(--text-black);
-  gap: 4px;
-  width: fit-content;
-  margin-left: auto;
-`
-
-const chatTime = css`
-  font-size: 10px;
-`
-
-const users__chatTime = css`
-  position: absolute;
-  bottom: 0;
-  right: -34px;
 `
 
 const ChatroomPage: React.FC = () => {
@@ -271,16 +124,6 @@ const ChatroomPage: React.FC = () => {
 
   const messageUpdate = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value)
-  }
-
-  // バルーンに改行を加える関数
-  const newLineFormater = (message: string) => {
-    return message.split('\n').map((line, index) => (
-      <React.Fragment key={index}>
-        {line}
-        <br />
-      </React.Fragment>
-    ))
   }
 
   // モーダルのcloseボタンを押下した際に、以下の処理を実行する
@@ -364,33 +207,11 @@ const ChatroomPage: React.FC = () => {
                 ) : null}
 
                 {chatmessage.sendUid !== loginUser?.id ? (
-                  <div css={messages__wrapper}>
-                    <img
-                      css={userImage}
-                      src={chatmessage.src}
-                      alt='user image'
-                    />
-                    <span css={messages__name}>test</span>
-                    <div css={messages__chatBalloonAndTime__wrapper}>
-                      <p css={[chatBalloon, users__chatBalloon]}>
-                        {newLineFormater(chatmessage.message)}
-                      </p>
-                      <time css={[chatTime, users__chatTime]}>
-                        {dateFormater(chatmessage.createdAt, 'hh/mm')}
-                      </time>
-                    </div>
-                  </div>
+                  // ログインユーザーではない場合
+                  <Balloon message={chatmessage} />
                 ) : (
-                  <div css={loginUserMessages__wrapper}>
-                    <div css={loginUserMessages__alreadyReadAndTime__wrapper}>
-                      <time css={chatTime}>
-                        {dateFormater(chatmessage.createdAt, 'hh/mm')}
-                      </time>
-                    </div>
-                    <p css={[chatBalloon, loginUser__chatBalloon]}>
-                      {newLineFormater(chatmessage.message)}
-                    </p>
-                  </div>
+                  // ログインユーザーの場合
+                  <Balloon sent message={chatmessage} />
                 )}
               </li>
             ))}
