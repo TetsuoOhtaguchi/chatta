@@ -12,6 +12,7 @@ interface SendMessageProps {
 const sendMessage = css`
   background-color: var(--bg-black);
   position: fixed;
+  z-index: 2;
   bottom: 0;
   max-width: 390px;
   width: 100%;
