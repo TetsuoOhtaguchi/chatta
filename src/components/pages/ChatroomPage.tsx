@@ -18,24 +18,13 @@ import { UsersContext } from '../../context/users/UsersProvider'
 import { MessagesContext } from '../../context/messages/MessagesProvider'
 
 import { handlePostDate } from '../../utils/helpers/handlePostDate'
+import { debounce } from '../../utils/helpers/debounce'
 
 import { ExtendedMessage } from '../../types'
 
 import SendMessage from '../ui/sendMessage/SendMessage'
 import Spinner from '../ui/modal/Spinner'
 import Balloon from '../ui/balloon/Balloon'
-
-const chatsListSection = css`
-  margin-top: 40px;
-  height: calc(100vh - 97px);
-  overflow-y: scroll;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  background-color: var(--bg-grey);
-  ::-webkit-scrollbar {
-    display: none;
-  }
-`
 
 const chatsList = css`
   display: flex;
@@ -67,6 +56,7 @@ const ChatroomPage: React.FC = () => {
 
   const timeoutIdRef = useRef<NodeJS.Timeout | null>(null)
   const chatsListRef = useRef<HTMLUListElement>(null)
+  const scrollRef = useRef<HTMLElement>(null)
 
   const [message, setMessage] = useState<string>('')
 
@@ -75,6 +65,21 @@ const ChatroomPage: React.FC = () => {
   const chatrooms = useContext(MessagesContext)
 
   const [chatmessageList, setChatmessageList] = useState<ExtendedMessage[]>([])
+
+  const [atBottom, setAtBottom] = useState(true)
+
+  const [height, setHeight] = useState<number>(0)
+  const chatsListSection = css`
+    margin-top: 40px;
+    height: calc(100vh - ${height + 40}px);
+    overflow-y: scroll;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    background-color: var(--bg-grey);
+    ::-webkit-scrollbar {
+      display: none;
+    }
+  `
 
   useEffect(() => {
     const loadingState = loginUser ? true : false
@@ -185,6 +190,41 @@ const ChatroomPage: React.FC = () => {
     }
   }
 
+  // スクロール関数
+  const handleScroll = () => {
+    const scrollElement = scrollRef.current
+    if (scrollElement) {
+      const isAtBottom =
+        scrollElement.scrollTop + scrollElement.clientHeight >=
+        scrollElement.scrollHeight
+
+      // スクロール位置が最下部にある場合true、最下部にいない場合falseをセットする
+      setAtBottom(isAtBottom)
+    }
+  }
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current
+    if (scrollElement) {
+      const debouncedHandleScroll = debounce(handleScroll, 100)
+      scrollElement.addEventListener('scroll', debouncedHandleScroll)
+      return () => {
+        scrollElement.removeEventListener('scroll', debouncedHandleScroll)
+      }
+    }
+  }, [])
+
+  const handleHeightChange = (newHeight: number) => {
+    // 高さを設定する
+    setHeight(newHeight)
+
+    // スクロール位置が最下部にあり、チャットリストが存在する場合
+    if (atBottom && chatsListRef.current) {
+      // 最下部へ自動スクロールさせる
+      chatsListRef.current.scrollIntoView(false)
+    }
+  }
+
   return (
     <>
       <Spinner
@@ -195,7 +235,7 @@ const ChatroomPage: React.FC = () => {
         onClose={modalCloseHandler}
       />
 
-      <section css={chatsListSection}>
+      <section css={chatsListSection} ref={scrollRef}>
         {chatmessageList?.length ? (
           <ul ref={chatsListRef} css={chatsList}>
             {chatmessageList.map((chatmessage, index) => (
@@ -223,6 +263,7 @@ const ChatroomPage: React.FC = () => {
         modelValue={message}
         onUpdateModelValue={messageUpdate}
         onClick={clickSendMessageButton}
+        onHeightChange={handleHeightChange}
       />
     </>
   )

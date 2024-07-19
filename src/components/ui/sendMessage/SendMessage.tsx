@@ -1,4 +1,4 @@
-import React, { ChangeEvent, MouseEventHandler } from 'react'
+import React, { ChangeEvent, MouseEventHandler, useRef, useEffect } from 'react'
 import { css } from '@emotion/react'
 import TextareaAutosize from 'react-textarea-autosize'
 import Send from '@mui/icons-material/Send'
@@ -7,6 +7,7 @@ interface SendMessageProps {
   modelValue: string | number
   onUpdateModelValue: (event: ChangeEvent<HTMLTextAreaElement>) => void
   onClick: MouseEventHandler<HTMLDivElement>
+  onHeightChange: (height: number) => void
 }
 
 const sendMessage = css`
@@ -62,13 +63,34 @@ const sendButton__icon = css`
 const SendMessage: React.FC<SendMessageProps> = ({
   modelValue,
   onUpdateModelValue,
-  onClick
+  onClick,
+  onHeightChange
 }) => {
+  const sendMessageRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (sendMessageRef.current) {
+      const observer = new ResizeObserver(entries => {
+        for (const entry of entries) {
+          if (entry.target === sendMessageRef.current) {
+            onHeightChange(entry.contentRect.height + 16)
+          }
+        }
+      })
+
+      observer.observe(sendMessageRef.current)
+
+      return () => {
+        observer.disconnect()
+      }
+    }
+  }, [onHeightChange])
+
   // テキストエリアに値が入力された場合、以下の処理を実行する
   const handleTextareaChange = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ) => {
-    // テキストエリアの高さが230pxになった場合、最下部へ自動スクロールする
+    // テキストエリアの高さが230pxになった場合、テキストエリアの最下部へ自動スクロールする
     if (event.target.clientHeight === 230) {
       event.target.scrollTop = event.target.scrollHeight
     }
@@ -77,7 +99,7 @@ const SendMessage: React.FC<SendMessageProps> = ({
   }
 
   return (
-    <div css={sendMessage}>
+    <div css={sendMessage} ref={sendMessageRef}>
       <TextareaAutosize
         css={sendMessage__textarea}
         value={modelValue}
