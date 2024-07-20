@@ -18,7 +18,7 @@ export const updateUser = functions
 
       return { success: true }
     } catch (error) {
-      console.log(error)
+      console.error(error)
       throw new functions.https.HttpsError(
         'internal',
         'occurred while updating the user.'

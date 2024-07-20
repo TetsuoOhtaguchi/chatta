@@ -24,14 +24,14 @@ export const createUser = functions
       await userDocRef.set({
         id: uid,
         email: data.email,
-        name: data.name,
+        name: data.name.trim(),
         src: '',
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       })
 
       return uid
     } catch (error) {
-      console.log(error)
+      console.error(error)
       throw new functions.https.HttpsError(
         'internal',
         'An error occurred while creating the user.'
