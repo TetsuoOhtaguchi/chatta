@@ -5,15 +5,23 @@ import React, {
   useState,
   useContext
 } from 'react'
+
 import { Link, useNavigate } from 'react-router-dom'
-import { LoginUserContext } from '../../context/auth/LoginUserProvider'
+
 import { css } from '@emotion/react'
+
+import { signInWithEmailAndPassword, UserCredential } from 'firebase/auth'
+import { auth } from '../../firebase'
+
+import { LoginUserContext } from '../../context/auth/LoginUserProvider'
+
 import { validationCheck } from '../../utils/helpers/validation'
+
+import { ErrorType } from '../../types'
+
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
 import Spinner from '../ui/modal/Spinner'
-import { signInWithEmailAndPassword, UserCredential } from 'firebase/auth'
-import { auth } from '../../firebase'
 
 const loginSection = css`
   display: grid;
@@ -38,6 +46,18 @@ const signupLink = css`
   text-align: center;
 `
 
+const errorMessageText = css`
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--text-error);
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--bg-white);
+  line-height: 1.4;
+  height: 52px;
+`
+
 const LoginPage: React.FC = () => {
   const navigate = useNavigate()
   const loginUser = useContext(LoginUserContext)
@@ -52,8 +72,10 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
-  const [emailError, setEmailError] = useState<boolean>(false)
-  const [passwordError, setPasswordError] = useState<boolean>(false)
+  const [error, setError] = useState<ErrorType>({
+    errorCode: '',
+    errorMessage: ''
+  })
 
   const [modalState, setModalState] = useState<boolean>(false)
   const [spinnerState, setSpinnerState] = useState<boolean>(true)
@@ -69,15 +91,24 @@ const LoginPage: React.FC = () => {
     setPassword(event.target.value)
   }
 
+  // ログイン処理を実行する
   const loginHandler: MouseEventHandler<HTMLButtonElement> = async event => {
     event.preventDefault()
 
-    setEmailError(validationCheck(email, null, 'email'))
-    setPasswordError(validationCheck(password, null, 'password'))
-    const emailErrorCheck = validationCheck(email, null, 'email')
-    const passwordErrorCheck = validationCheck(password, null, 'password')
+    const userData = {
+      file: null,
+      name: '',
+      email: email,
+      password: password
+    }
 
-    if (emailErrorCheck || passwordErrorCheck) return
+    // 入力チェックを行う
+    const validationCheckResult = validationCheck('login', userData)
+    setError(validationCheckResult)
+
+    // エラーが存在する場合、処理を終了する
+    if (validationCheckResult.errorCode && validationCheckResult.errorMessage)
+      return
 
     // モーダルを展開する
     setModalState(true)
@@ -92,12 +123,20 @@ const LoginPage: React.FC = () => {
       const user = credential.user
 
       if (user) {
+        setError({
+          errorCode: '',
+          errorMessage: ''
+        })
         navigate('/chatroom')
         setEmail('')
         setPassword('')
         setModalState(false)
       }
     } catch (error) {
+      setError({
+        errorCode: 'auth',
+        errorMessage: 'Email address or password is incorrect'
+      })
       setSpinnerState(false)
       setModalSppinerMessage('')
       setModalCompletionMessage('')
@@ -110,10 +149,6 @@ const LoginPage: React.FC = () => {
     setSpinnerState(true)
     setModalSppinerMessage('')
     setModalCompletionMessage('')
-
-    // メールアドレスとパスワードをエラー表示にする
-    setEmailError(true)
-    setPasswordError(true)
   }
 
   return (
@@ -131,7 +166,9 @@ const LoginPage: React.FC = () => {
             modelValue={email}
             type='text'
             label='Email'
-            error={emailError}
+            error={
+              error.errorCode === 'emailError' || error.errorCode === 'auth'
+            }
             icon=''
             onUpdateModelValue={emailUpdate}
           />
@@ -139,7 +176,9 @@ const LoginPage: React.FC = () => {
             modelValue={password}
             type='password'
             label='Password'
-            error={passwordError}
+            error={
+              error.errorCode === 'passwordError' || error.errorCode === 'auth'
+            }
             icon='password'
             onUpdateModelValue={passwordUpdate}
           />
@@ -147,6 +186,7 @@ const LoginPage: React.FC = () => {
           <Link css={signupLink} to={'/signup'}>
             Signup
           </Link>
+          <p css={errorMessageText}>{error.errorMessage}</p>
         </div>
       </form>
     </>

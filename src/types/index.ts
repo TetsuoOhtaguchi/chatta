@@ -1,5 +1,5 @@
 export * from './ui/modal/ModalTypes'
+export * from './ui/error/ErrorTypes'
 export * from './db/users/UserType'
 export * from './db/users/ExtendedUserType'
 export * from './db/messages/MessageType'
-export * from './db/messages/ExtendedMessageType'

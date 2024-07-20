@@ -1,15 +1,21 @@
 import React, { ChangeEvent, MouseEventHandler, useState, useRef } from 'react'
+
 import { Link } from 'react-router-dom'
+
 import { css } from '@emotion/react'
-import '../../assets/css/variable.css'
-import { validationCheck } from '../../utils/helpers/validation'
-import Button from '../ui/button/Button'
-import Input from '../ui/input/Input'
-import Spinner from '../ui/modal/Spinner'
+
 import { functions } from '../../firebase'
 import { httpsCallable } from 'firebase/functions'
 import { storage } from '../../firebase'
 import { uploadFile } from '../../utils/firebase/storage/uploadFile'
+
+import { validationCheck } from '../../utils/helpers/validation'
+
+import { ErrorType } from '../../types'
+
+import Button from '../ui/button/Button'
+import Input from '../ui/input/Input'
+import Spinner from '../ui/modal/Spinner'
 
 const signupSection = css`
   display: grid;
@@ -51,6 +57,18 @@ const loginLink = css`
   text-align: center;
 `
 
+const errorMessageText = css`
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--text-error);
+  font-size: 12px;
+  font-weight: 600;
+  background-color: var(--bg-white);
+  line-height: 1.4;
+  height: 52px;
+`
+
 const SignupPage: React.FC = () => {
   const [src, setSrc] = useState('noimage.png')
   const [fileObject, setFileObject] = useState<File | null>(null)
@@ -59,10 +77,10 @@ const SignupPage: React.FC = () => {
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
-  const [fileError, setFileError] = useState<boolean>(false)
-  const [nameError, setNameError] = useState<boolean>(false)
-  const [emailError, setEmailError] = useState<boolean>(false)
-  const [passwordError, setPasswordError] = useState<boolean>(false)
+  const [error, setError] = useState<ErrorType>({
+    errorCode: '',
+    errorMessage: ''
+  })
 
   const [modalState, setModalState] = useState<boolean>(false)
   const [spinnerState, setSpinnerState] = useState<boolean>(true)
@@ -100,22 +118,19 @@ const SignupPage: React.FC = () => {
   const signupHandler: MouseEventHandler<HTMLButtonElement> = async event => {
     event.preventDefault()
 
-    // 入力チェックを実行する
-    setFileError(validationCheck('', fileObject, 'file'))
-    setNameError(validationCheck(name, null, 'name'))
-    setEmailError(validationCheck(email, null, 'email'))
-    setPasswordError(validationCheck(password, null, 'password'))
-    const fileErrorCheck = validationCheck('', fileObject, 'file')
-    const nameErrorCheck = validationCheck(name, null, 'name')
-    const emailErrorCheck = validationCheck(email, null, 'email')
-    const passwordErrorCheck = validationCheck(password, null, 'password')
+    const userData = {
+      file: fileObject,
+      name: name,
+      email: email,
+      password: password
+    }
 
-    if (
-      fileErrorCheck ||
-      nameErrorCheck ||
-      emailErrorCheck ||
-      passwordErrorCheck
-    )
+    // 入力チェックを行う
+    const validationCheckResult = validationCheck('signup', userData)
+    setError(validationCheckResult)
+
+    // エラーが存在する場合、処理を終了する
+    if (validationCheckResult.errorCode && validationCheckResult.errorMessage)
       return
 
     // モーダルを展開する
@@ -150,12 +165,20 @@ const SignupPage: React.FC = () => {
 
         // 全ての情報保存処理が成功した場合、スピナーを停止する
         if (data.success) {
+          setError({
+            errorCode: '',
+            errorMessage: ''
+          })
           setSpinnerState(false)
           setModalSppinerMessage('')
           setModalCompletionMessage('Completion!!')
         }
       }
     } catch (error) {
+      setError({
+        errorCode: 'auth',
+        errorMessage: 'Sign-up failed.'
+      })
       setSpinnerState(false)
       setModalSppinerMessage('')
       setModalCompletionMessage('')
@@ -169,11 +192,15 @@ const SignupPage: React.FC = () => {
     setModalSppinerMessage('')
     setModalCompletionMessage('')
     if (!modalCompletionMessage) {
-      setFileError(true)
-      setNameError(true)
-      setEmailError(true)
-      setPasswordError(true)
+      setError({
+        errorCode: 'auth',
+        errorMessage: 'Sign-up failed.'
+      })
     } else {
+      setError({
+        errorCode: '',
+        errorMessage: ''
+      })
       setSrc('noimage.png')
       setName('')
       setEmail('')
@@ -195,7 +222,11 @@ const SignupPage: React.FC = () => {
           <img
             src={src}
             alt='profile image'
-            css={[profileImageStyle, fileError && profileImageErrorStyle]}
+            css={[
+              profileImageStyle,
+              (error.errorCode === 'fileError' || error.errorCode === 'auth') &&
+                profileImageErrorStyle
+            ]}
             onClick={onImageClick}
           />
           <input
@@ -209,7 +240,9 @@ const SignupPage: React.FC = () => {
             modelValue={name}
             type='text'
             label='Name'
-            error={nameError}
+            error={
+              error.errorCode === 'nameError' || error.errorCode === 'auth'
+            }
             icon=''
             onUpdateModelValue={nameUpdate}
           />
@@ -217,7 +250,9 @@ const SignupPage: React.FC = () => {
             modelValue={email}
             type='text'
             label='Email'
-            error={emailError}
+            error={
+              error.errorCode === 'emailError' || error.errorCode === 'auth'
+            }
             icon=''
             onUpdateModelValue={emailUpdate}
           />
@@ -225,7 +260,9 @@ const SignupPage: React.FC = () => {
             modelValue={password}
             type='password'
             label='Password'
-            error={passwordError}
+            error={
+              error.errorCode === 'passwordError' || error.errorCode === 'auth'
+            }
             icon='password'
             onUpdateModelValue={passwordUpdate}
           />
@@ -233,6 +270,7 @@ const SignupPage: React.FC = () => {
           <Link css={loginLink} to={'/'}>
             Login
           </Link>
+          <p css={errorMessageText}>{error.errorMessage}</p>
         </div>
       </form>
     </>
