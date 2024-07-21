@@ -1,5 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import emotionRset from 'emotion-reset'
+import './assets/css/variable.css'
 import { Global, css } from '@emotion/react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { LoginUserProvider } from './context/auth/LoginUserProvider'
