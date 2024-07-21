@@ -12,6 +12,7 @@ interface BalloonProps {
 
 const balloonCommon = css`
   max-width: calc(100vw / 1.5);
+  min-width: 46px;
   width: fit-content;
   padding: 8px 16px;
   border-radius: 15px;
@@ -43,7 +44,7 @@ const balloonLeft__name = css`
   font-weight: 600;
   color: var(--text--black);
   top: 40px;
-  left: 30px;
+  left: 32px;
   width: fit-content;
   white-space: nowrap;
 `
@@ -66,12 +67,12 @@ const balloonLeft = css`
     height: 0;
     border-radius: 50%;
     transform: rotate(45deg);
-    left: 10px;
-    top: -10px;
-    border-left: 20px solid var(--bg-black);
-    border-top: 20px solid var(--bg-black);
-    border-right: 20px solid transparent;
-    border-bottom: 20px solid transparent;
+    left: 18px;
+    top: -9px;
+    border-left: 9px solid var(--bg-black);
+    border-top: 9px solid var(--bg-black);
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid transparent;
   }
 
   ::after {
@@ -82,12 +83,12 @@ const balloonLeft = css`
     height: 0;
     border-radius: 50%;
     transform: rotate(45deg);
-    left: 20px;
-    top: -15px;
-    border-left: 15px solid var(--bg-grey);
-    border-top: 15px solid var(--bg-grey);
-    border-right: 15px solid transparent;
-    border-bottom: 15px solid transparent;
+    left: 26px;
+    top: -10px;
+    border-left: 10px solid var(--bg-grey);
+    border-top: 10px solid var(--bg-grey);
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid transparent;
   }
 `
 
@@ -135,8 +136,8 @@ const balloonRight = css`
     height: 0;
     border-radius: 50%;
     transform: rotate(225deg);
-    right: 14px;
-    top: 27px;
+    right: 8px;
+    bottom: -9px;
     border-left: 9px solid var(--bg-white);
     border-top: 9px solid var(--bg-white);
     border-right: 9px solid transparent;
@@ -151,12 +152,12 @@ const balloonRight = css`
     height: 0;
     border-radius: 50%;
     transform: rotate(225deg);
-    right: 6px;
-    top: 28px;
-    border-left: 9px solid var(--bg-grey);
-    border-top: 9px solid var(--bg-grey);
-    border-right: 9px solid transparent;
-    border-bottom: 9px solid transparent;
+    right: -1px;
+    bottom: -10px;
+    border-left: 10px solid var(--bg-grey);
+    border-top: 10px solid var(--bg-grey);
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid transparent;
   }
 `
 
