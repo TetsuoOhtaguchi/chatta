@@ -62,7 +62,7 @@ const ChatroomPage: React.FC = () => {
 
   const loginUser = useContext(LoginUserContext)
   const users = useContext(UsersContext)
-  const chatrooms = useContext(MessagesContext)
+  const messages = useContext(MessagesContext)
 
   const [chatmessageList, setChatmessageList] = useState<ExtendedMessage[]>([])
 
@@ -97,7 +97,7 @@ const ChatroomPage: React.FC = () => {
       }
     }, 10000)
 
-    const chatlist = chatrooms?.map(chat => {
+    const initMessages = messages?.map(chat => {
       const extendedChat = chat as ExtendedMessage
       users?.find(user => {
         if (user.id === chat.sendUid) {
@@ -108,7 +108,7 @@ const ChatroomPage: React.FC = () => {
       return chat
     })
 
-    setChatmessageList(chatlist as ExtendedMessage[])
+    setChatmessageList(initMessages as ExtendedMessage[])
 
     return () => {
       // timeoutIdRef.currentがnullでない場合
@@ -117,7 +117,7 @@ const ChatroomPage: React.FC = () => {
         clearTimeout(timeoutIdRef.current)
       }
     }
-  }, [loginUser, users, chatrooms])
+  }, [loginUser, users, messages])
 
   useEffect(() => {
     // チャットリストが存在しない場合、処理を終了する
@@ -194,11 +194,10 @@ const ChatroomPage: React.FC = () => {
   const handleScroll = () => {
     const scrollElement = scrollRef.current
     if (scrollElement) {
+      // スクロール位置が最下部にある場合true、最下部にいない場合falseをセットする
       const isAtBottom =
         scrollElement.scrollTop + scrollElement.clientHeight >=
         scrollElement.scrollHeight
-
-      // スクロール位置が最下部にある場合true、最下部にいない場合falseをセットする
       setAtBottom(isAtBottom)
     }
   }
