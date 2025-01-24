@@ -1,4 +1,4 @@
-# React + TypeScript + Vite
+# Chatta
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
@@ -29,9 +29,11 @@ export default {
 - Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
 - Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
 
-// Memo Cloud Functions deploy
-Error: Your project chatta-8ea13 must be on the Blaze (pay-as-you-go) plan to complete this command. Required API artifactregistry.googleapis.com can't be enabled until the upgrade is complete. To upgrade, visit the following URL:
+## Cloud Functions デプロイ時のエラーについて
+- Error: Your project chatta-8ea13 must be on the Blaze (pay-as-you-go) plan to complete this command. Required API artifactregistry.googleapis.com can't be enabled until the upgrade is complete. To upgrade, visit the following URL:<br>（エラー： このコマンドを実行するには、プロジェクト chatta-8ea13 が Blaze（従量課金）プランである必要があります。必須 API artifactregistry.googleapis.com は、アップグレードが完了するまで有効にできません。アップグレードするには、以下のURLにアクセスしてください：）
+ - 実行コマンド
+  - `$ firebase deploy --only functions`
 
-https://console.firebase.google.com/project/chatta-8ea13/usage/details
-
-// $ firebase deploy --only functions
+## Reactのアップグレード手順
+- 以下コマンドを実行する。（18.3.1にアップグレードする場合）
+`npm install react@18.3.1 react-dom@18.3.1`
