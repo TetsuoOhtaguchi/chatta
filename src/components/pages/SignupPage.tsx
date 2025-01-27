@@ -44,6 +44,11 @@ const profileImageStyle = css`
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 `
 
+const nameWrapper = css`
+  display: flex;
+  gap: 16px;
+`
+
 const profileImageErrorStyle = css`
   background-color: var(--bg-error);
 `
@@ -73,6 +78,9 @@ const SignupPage: React.FC = () => {
   const [src, setSrc] = useState('noimage.png')
   const [fileObject, setFileObject] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [chattaName, setChattaName] = useState<string>('')
+  const [firstName, setFirstName] = useState<string>('')
+  const [lastName, setLastName] = useState<string>('')
   const [name, setName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
@@ -102,6 +110,18 @@ const SignupPage: React.FC = () => {
     }
   }
 
+  const chattaNameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    setChattaName(event.target.value)
+  }
+
+  const firstNameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    setFirstName(event.target.value)
+  }
+
+  const lastNameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    setLastName(event.target.value)
+  }
+
   const nameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
     setName(event.target.value)
   }
@@ -117,6 +137,8 @@ const SignupPage: React.FC = () => {
   // 新規登録処理を実行する
   const signupHandler: MouseEventHandler<HTMLButtonElement> = async event => {
     event.preventDefault()
+
+    // todo 新規登録処理の修正を行う（対象：chattaName、firstName、lastName）
 
     const userData = {
       file: fileObject,
@@ -236,6 +258,44 @@ const SignupPage: React.FC = () => {
             onChange={onFileInputChange}
             style={{ display: 'none' }}
           />
+
+          <Input
+            modelValue={chattaName}
+            type='text'
+            label='Chatta Name'
+            error={
+              error.errorCode === 'chattaNameError' ||
+              error.errorCode === 'auth'
+            }
+            icon=''
+            onUpdateModelValue={chattaNameUpdate}
+          />
+
+          <div css={nameWrapper}>
+            <Input
+              modelValue={firstName}
+              type='text'
+              label='First Name'
+              error={
+                error.errorCode === 'firstNameError' ||
+                error.errorCode === 'auth'
+              }
+              icon=''
+              onUpdateModelValue={firstNameUpdate}
+            />
+            <Input
+              modelValue={lastName}
+              type='text'
+              label='Last Name'
+              error={
+                error.errorCode === 'lastNameError' ||
+                error.errorCode === 'auth'
+              }
+              icon=''
+              onUpdateModelValue={lastNameUpdate}
+            />
+          </div>
+
           <Input
             modelValue={name}
             type='text'

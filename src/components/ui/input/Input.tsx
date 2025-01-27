@@ -50,6 +50,7 @@ const input = css`
   appearance: none;
   border-bottom: solid 1px;
   height: 36px;
+  width: 100%;
 `
 
 const errorInput = css`
