@@ -2,10 +2,17 @@ type ProcedureType = 'login' | 'signup'
 
 interface UserDataType {
   file: File | null
-  name: string
+  chattaName: string
+  firstName: string
+  lastName: string
   email: string
   password: string
 }
+
+// 名前のバリデーションパターン：全角ひらがな、全角漢字、全角カタカナ、全角英語、半角英語
+// todo バリデーションチェックのパターン修正を行う
+const nameValidPattern =
+  /^[\u30a0-\u30ff\u3040-\u309f\u3005-\u3006\u30e0-\u9fcf]+$/
 
 export const validationCheck = (
   procedure: ProcedureType,
@@ -19,20 +26,59 @@ export const validationCheck = (
     }
   }
 
-  // サインアップ時、名前が未入力の場合
-  if (procedure === 'signup' && !userData.name) {
+  // サインアップ時、チャッタネームが未入力の場合
+  if (procedure === 'signup' && !userData.chattaName) {
     return {
-      errorCode: 'nameError',
-      errorMessage: 'Please enter your name.'
+      errorCode: 'chattaNameError',
+      errorMessage: 'Please enter your chatta name.'
     }
   }
 
-  // サインアップ時、名前に全角ひらがな、全角漢字、全角カタカナ、全角英語、半角英語、以外の文字が入力されている場合
-  const nameValidPattern =
-    /^[\u3040-\u309F\u30A0-\u30FF\uFF21-\uFF3A\uFF41-\uFF5AA-Za-z\u4E00-\u9FFF]+$/
-  if (procedure === 'signup' && !nameValidPattern.test(userData.name.trim())) {
+  // サインアップ時、名が未入力の場合
+  if (procedure === 'signup' && !userData.firstName) {
     return {
-      errorCode: 'nameError',
+      errorCode: 'firstNameError',
+      errorMessage: 'Please enter your first name.'
+    }
+  }
+
+  // サインアップ時、姓が未入力の場合
+  if (procedure === 'signup' && !userData.lastName) {
+    return {
+      errorCode: 'lastNameError',
+      errorMessage: 'Please enter your last name.'
+    }
+  }
+
+  // サインアップ時、チャッタネームに名前のバリデーションパターン以外の文字が入力されている場合
+  if (
+    procedure === 'signup' &&
+    !nameValidPattern.test(userData.chattaName.trim())
+  ) {
+    return {
+      errorCode: 'chattaNameError',
+      errorMessage: 'Contains invalid characters.'
+    }
+  }
+
+  // サインアップ時、名に名前のバリデーションパターン以外の文字が入力されている場合
+  if (
+    procedure === 'signup' &&
+    !nameValidPattern.test(userData.firstName.trim())
+  ) {
+    return {
+      errorCode: 'firstNameError',
+      errorMessage: 'Contains invalid characters.'
+    }
+  }
+
+  // サインアップ時、姓に名前のバリデーションパターン以外の文字が入力されている場合
+  if (
+    procedure === 'signup' &&
+    !nameValidPattern.test(userData.lastName.trim())
+  ) {
+    return {
+      errorCode: 'lastNameError',
       errorMessage: 'Contains invalid characters.'
     }
   }
