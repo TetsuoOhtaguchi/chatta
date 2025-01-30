@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom'
 
 import { css } from '@emotion/react'
 
-// import { functions } from '../../firebase'
-// import { httpsCallable } from 'firebase/functions'
-// import { storage } from '../../firebase'
-// import { uploadFile } from '../../utils/firebase/storage/uploadFile'
+import { functions } from '../../firebase'
+import { httpsCallable } from 'firebase/functions'
+import { storage } from '../../firebase'
+import { uploadFile } from '../../utils/firebase/storage/uploadFile'
 
 import { validationCheck } from '../../utils/helpers/validation'
 
@@ -151,55 +151,57 @@ const SignupPage: React.FC = () => {
       return
 
     // モーダルを展開する
-    // setModalState(true)
-    // setModalSppinerMessage('New registration')
+    setModalState(true)
+    setModalSppinerMessage('New registration')
 
-    // // Firebase処理を実行する
-    // try {
-    //   // Firebase Cloud Functionsを呼び出す
-    //   // Authにユーザー情報を登録し、Firestoreにユーザー情報を保存する
-    //   const createUserFunction = httpsCallable(functions, 'createUser')
-    //   const createUserResult = await createUserFunction({
-    //     name,
-    //     email,
-    //     password
-    //   })
-    //   const uid = createUserResult.data
+    // Firebase処理を実行する
+    try {
+      // Firebase Cloud Functionsを呼び出す
+      // Authにユーザー情報を登録し、Firestoreにユーザー情報を保存する
+      const createUserFunction = httpsCallable(functions, 'createUser')
+      const createUserResult = await createUserFunction({
+        chattaName,
+        firstName,
+        lastName,
+        email,
+        password
+      })
+      const uid = createUserResult.data
 
-    //   // 新規登録が成功した場合
-    //   if (uid) {
-    //     // Firestorageに画像を保存する
-    //     const srcUrl = await uploadFile(storage, `users/${uid}`, fileObject!)
+      // 新規登録が成功した場合
+      if (uid) {
+        // Firestorageに画像を保存する
+        const srcUrl = await uploadFile(storage, `users/${uid}`, fileObject!)
 
-    //     // ユーザー情報を更新する
-    //     const updateUserFunction = httpsCallable(functions, 'updateUser')
-    //     const updateUserResult = await updateUserFunction({
-    //       id: uid,
-    //       src: srcUrl
-    //     })
+        // ユーザー情報を更新する
+        const updateUserFunction = httpsCallable(functions, 'updateUser')
+        const updateUserResult = await updateUserFunction({
+          id: uid,
+          src: srcUrl
+        })
 
-    //     const data = updateUserResult.data as { success: boolean }
+        const data = updateUserResult.data as { success: boolean }
 
-    //     // 全ての情報保存処理が成功した場合、スピナーを停止する
-    //     if (data.success) {
-    //       setError({
-    //         errorCode: '',
-    //         errorMessage: ''
-    //       })
-    //       setSpinnerState(false)
-    //       setModalSppinerMessage('')
-    //       setModalCompletionMessage('Completion!!')
-    //     }
-    //   }
-    // } catch (error) {
-    //   setError({
-    //     errorCode: 'auth',
-    //     errorMessage: 'Sign-up failed.'
-    //   })
-    //   setSpinnerState(false)
-    //   setModalSppinerMessage('')
-    //   setModalCompletionMessage('')
-    // }
+        // 全ての情報保存処理が成功した場合、スピナーを停止する
+        if (data.success) {
+          setError({
+            errorCode: '',
+            errorMessage: ''
+          })
+          setSpinnerState(false)
+          setModalSppinerMessage('')
+          setModalCompletionMessage('Completion!!')
+        }
+      }
+    } catch (error) {
+      setError({
+        errorCode: 'auth',
+        errorMessage: 'Sign-up failed.'
+      })
+      setSpinnerState(false)
+      setModalSppinerMessage('')
+      setModalCompletionMessage('')
+    }
   }
 
   // モーダルのcloseボタンを押下した際に、以下の処理を実行する
