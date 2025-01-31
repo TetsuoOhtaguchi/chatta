@@ -177,7 +177,7 @@ const Balloon: React.FC<BalloonProps> = ({ sent = false, message }) => {
       {!sent ? (
         <div css={balloonLeft__wrapper}>
           <img css={balloonLeft__image} src={message.src} alt='user image' />
-          <span css={balloonLeft__name}>{message.name}</span>
+          <span css={balloonLeft__name}>{message.chattaName}</span>
           <div css={balloonLeft__inner__wrapper}>
             <p css={[balloonCommon, balloonLeft]}>
               {newLineFormater(message.message)}

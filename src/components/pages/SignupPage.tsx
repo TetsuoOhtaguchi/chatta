@@ -27,7 +27,7 @@ const flexBox = css`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 30px;
   width: var(--page-width);
 `
 

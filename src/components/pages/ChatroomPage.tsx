@@ -101,7 +101,7 @@ const ChatroomPage: React.FC = () => {
       const extendedChat = chat as ExtendedMessage
       users?.find(user => {
         if (user.id === chat.sendUid) {
-          extendedChat.name = user.name
+          extendedChat.chattaName = user.chattaName
           extendedChat.src = user.src
         }
       })
