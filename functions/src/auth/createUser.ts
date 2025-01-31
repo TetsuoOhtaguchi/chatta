@@ -24,7 +24,9 @@ export const createUser = functions
       await userDocRef.set({
         id: uid,
         email: data.email,
-        name: data.name.trim(),
+        chattaName: data.chattaName.trim(),
+        firstName: data.firstName.trim(),
+        lastName: data.lastName.trim(),
         src: '',
         createdAt: admin.firestore.FieldValue.serverTimestamp()
       })

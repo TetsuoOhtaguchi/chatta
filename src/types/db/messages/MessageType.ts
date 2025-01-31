@@ -9,6 +9,6 @@ export interface Message {
 
 // Message型を拡張する
 export interface ExtendedMessage extends Message {
-  name?: string
+  chattaName?: string
   src?: string
 }

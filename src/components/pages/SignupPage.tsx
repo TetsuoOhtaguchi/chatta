@@ -27,7 +27,7 @@ const flexBox = css`
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 30px;
   width: var(--page-width);
 `
 
@@ -42,6 +42,11 @@ const profileImageStyle = css`
   vertical-align: top;
   margin: 0 auto;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+`
+
+const nameWrapper = css`
+  display: flex;
+  gap: 16px;
 `
 
 const profileImageErrorStyle = css`
@@ -73,7 +78,9 @@ const SignupPage: React.FC = () => {
   const [src, setSrc] = useState('noimage.png')
   const [fileObject, setFileObject] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [name, setName] = useState<string>('')
+  const [chattaName, setChattaName] = useState<string>('')
+  const [firstName, setFirstName] = useState<string>('')
+  const [lastName, setLastName] = useState<string>('')
   const [email, setEmail] = useState<string>('')
   const [password, setPassword] = useState<string>('')
 
@@ -102,8 +109,16 @@ const SignupPage: React.FC = () => {
     }
   }
 
-  const nameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value)
+  const chattaNameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    setChattaName(event.target.value)
+  }
+
+  const firstNameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    setFirstName(event.target.value)
+  }
+
+  const lastNameUpdate = (event: ChangeEvent<HTMLInputElement>) => {
+    setLastName(event.target.value)
   }
 
   const emailUpdate = (event: ChangeEvent<HTMLInputElement>) => {
@@ -120,7 +135,9 @@ const SignupPage: React.FC = () => {
 
     const userData = {
       file: fileObject,
-      name: name,
+      chattaName: chattaName,
+      firstName: firstName,
+      lastName: lastName,
       email: email,
       password: password
     }
@@ -143,7 +160,9 @@ const SignupPage: React.FC = () => {
       // Authにユーザー情報を登録し、Firestoreにユーザー情報を保存する
       const createUserFunction = httpsCallable(functions, 'createUser')
       const createUserResult = await createUserFunction({
-        name,
+        chattaName,
+        firstName,
+        lastName,
         email,
         password
       })
@@ -202,7 +221,9 @@ const SignupPage: React.FC = () => {
         errorMessage: ''
       })
       setSrc('noimage.png')
-      setName('')
+      setChattaName('')
+      setFirstName('')
+      setLastName('')
       setEmail('')
       setPassword('')
     }
@@ -237,15 +258,40 @@ const SignupPage: React.FC = () => {
             style={{ display: 'none' }}
           />
           <Input
-            modelValue={name}
+            modelValue={chattaName}
             type='text'
-            label='Name'
+            label='Chatta Name'
             error={
-              error.errorCode === 'nameError' || error.errorCode === 'auth'
+              error.errorCode === 'chattaNameError' ||
+              error.errorCode === 'auth'
             }
             icon=''
-            onUpdateModelValue={nameUpdate}
+            onUpdateModelValue={chattaNameUpdate}
           />
+          <div css={nameWrapper}>
+            <Input
+              modelValue={firstName}
+              type='text'
+              label='First Name'
+              error={
+                error.errorCode === 'firstNameError' ||
+                error.errorCode === 'auth'
+              }
+              icon=''
+              onUpdateModelValue={firstNameUpdate}
+            />
+            <Input
+              modelValue={lastName}
+              type='text'
+              label='Last Name'
+              error={
+                error.errorCode === 'lastNameError' ||
+                error.errorCode === 'auth'
+              }
+              icon=''
+              onUpdateModelValue={lastNameUpdate}
+            />
+          </div>
           <Input
             modelValue={email}
             type='text'
