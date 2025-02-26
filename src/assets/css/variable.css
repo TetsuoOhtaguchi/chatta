@@ -1,0 +1,20 @@
+:root {
+  --text-black: #000000;
+  --text-white: #ffffff;
+  --text-hover: #bebebe;
+  --text-gray: #5f5f5f;
+  --text-error: #ff2525;
+
+  --bg-black: #000000;
+  --bg-white: #ffffff;
+  --bg-blackRgb: rgb(0, 0, 0, 0.7);
+  --bg-grey: #eae9e9;
+  --bg-error: #ff9494;
+
+  --border-black: #000000;
+  --border-white: #ffffff;
+
+  --font-weight: 600;
+
+  --page-width: calc(100% - 36px);
+}
